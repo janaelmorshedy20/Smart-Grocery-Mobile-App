@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smartgrocery/Login1.dart';
 import 'package:smartgrocery/WelcomeScreen.dart';
 import 'Signup.dart';
@@ -8,6 +7,7 @@ import 'Login2.dart';
 
 import 'CategoryScreen.dart';
 import 'ProductsScreen.dart';
+import 'ProductDetailsScreen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/welcome': (context) => const  WelcomeScreen(),
         '/categories': (context) => const  CategoryScreen(),
         '/products': (context) => const  ProductsScreen(),
-        // '/welcome': (context) => const  WelcomeScreen(),
+        '/productDetails': (context) => const ProductDetailsScreen(productId: 'wCHMHvZQ2GhBdP7c5oaw'),
         // '/welcome': (context) => const  WelcomeScreen(),
         // '/welcome': (context) => const  WelcomeScreen(),
         // '/welcome': (context) => const  WelcomeScreen(),

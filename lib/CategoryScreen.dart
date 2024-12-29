@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'productsScreen.dart';
+
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({Key? key}) : super(key: key);
 
@@ -51,7 +53,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
             return GestureDetector(
               onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => ProductDetailsScreen(productId: product.id),),);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsScreen(),),);
                 setState(() {
                   selectedIndex = index;
                 });
