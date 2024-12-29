@@ -8,6 +8,7 @@ import 'Login2.dart';
 import 'CategoryScreen.dart';
 import 'ProductsScreen.dart';
 import 'ProductDetailsScreen.dart';
+import 'addProduct.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,10 +35,7 @@ class MyApp extends StatelessWidget {
         '/categories': (context) => const  CategoryScreen(),
         '/products': (context) => const  ProductsScreen(),
         '/productDetails': (context) => const ProductDetailsScreen(productId: 'wCHMHvZQ2GhBdP7c5oaw'),
-        // '/welcome': (context) => const  WelcomeScreen(),
-        // '/welcome': (context) => const  WelcomeScreen(),
-        // '/welcome': (context) => const  WelcomeScreen(),
-
+        '/addProduct': (context) => const  AddProductScreen(),
         
        
         
