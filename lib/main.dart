@@ -6,11 +6,12 @@ import 'package:smartgrocery/WelcomeScreen.dart';
 import 'Signup.dart';
 import 'Login2.dart';
 
-import 'categories.dart';
+import 'CategoryScreen.dart';
+import 'ProductsScreen.dart';
 
 void main() async{
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         '/login2': (context) => const  LoginScreen2(),
         '/welcome': (context) => const  WelcomeScreen(),
         '/categories': (context) => const  CategoryScreen(),
-        // '/welcome': (context) => const  WelcomeScreen(),
+        '/products': (context) => const  ProductsScreen(),
         // '/welcome': (context) => const  WelcomeScreen(),
         // '/welcome': (context) => const  WelcomeScreen(),
         // '/welcome': (context) => const  WelcomeScreen(),
