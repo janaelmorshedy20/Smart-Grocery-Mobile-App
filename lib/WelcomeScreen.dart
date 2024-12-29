@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:smartgrocery/Login1.dart';
 import 'package:smartgrocery/Login2.dart';
-import 'package:smartgrocery/Signup.dart';
+import 'package:smartgrocery/signup.dart';
+
+
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -53,7 +55,7 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(context,MaterialPageRoute(builder:(context)=>const LoginScreen2()),);
                   },
-                  child: const Text('Continue with Email or Phone' , style: TextStyle(fontWeight: FontWeight.bold , fontSize: 15 , color: Colors.black)),
+                  child: const Text('Already have an account' , style: TextStyle(fontWeight: FontWeight.bold , fontSize: 15 , color: Colors.black)),
                 ),
                 const SizedBox(height: 11),
                  ElevatedButton(
