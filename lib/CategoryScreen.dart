@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'HomePage.dart';
+import 'favoritelist.dart';
 import 'productsScreen.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -28,6 +30,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   ];
 
   int selectedIndex = -1; // Default: No category selected
+  int _selected = 1;  // Default selected index (Home)
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +87,35 @@ class _CategoryScreenState extends State<CategoryScreen> {
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
-        currentIndex: 1, // Default selected index (Menu)
+        currentIndex: _selected, // Default selected index (Menu)
         onTap: (index) {
-          // Handle navigation here
-          print('Tapped on index $index');
+    setState(() {
+      _selected = index; // Update the selected index
+    });
+
+    // Navigate to the respective page when a bottom item is tapped
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CategoryScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+        );
+        break;
+      default:
+        break;
+    }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

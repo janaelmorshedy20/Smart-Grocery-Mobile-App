@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'categoryScreen.dart';
+import 'favoritelist.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -94,6 +97,17 @@ class _HomePageState extends State<HomePage> {
           .toList();
     });
   }
+
+  int _selectedIndex = 0;  // Default selected index (Home)
+
+  // List of pages to navigate to
+  // final List<Widget> _pages = [
+  //   const HomePage(),
+  //   const CategoryScreen(),
+  //   const FavoriteListScreen(),
+  //   //ProfilePage(),
+  // ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -332,6 +346,46 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex, // Default selected index (Menu)
+        onTap: (index) {
+    setState(() {
+      _selectedIndex = index; // Update the selected index
+    });
+
+    // Navigate to the respective page when a bottom item is tapped
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+        break;
+      case 1:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CategoryScreen()),
+        );
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+        );
+        break;
+      default:
+        break;
+    }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Save'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }

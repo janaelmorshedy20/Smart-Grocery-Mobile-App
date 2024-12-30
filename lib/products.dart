@@ -98,19 +98,18 @@ class ProductsPage extends StatelessWidget {
               fit: BoxFit.cover,
             )
           else
-            const Icon(Icons.image_not_supported, size: 80, color: Colors.grey),
+            const Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
           const SizedBox(height: 8),
           Text(
             product['name'] ?? 'Unknown',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Text(
             '\$${product['price']}',
-            style: const TextStyle(fontSize: 14, color: Colors.green),
+            style: const TextStyle(fontSize: 12, color: Colors.green),
           ),
-          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
