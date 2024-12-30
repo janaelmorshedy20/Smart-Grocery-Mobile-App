@@ -62,6 +62,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
       );
       return;
     }
+    if (_selectedCategory == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a category")),
+      );
+      return;
+    }
+    if (_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter the product name")),
+      );
+      return;
+    }
+
+    if (_detailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter product details")),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
