@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       
-      initialRoute: '/addProduct', // Define the initial screen
+      initialRoute: '/welcome', // Define the initial screen
       routes: {
         '/signup': (context) => const SignUpScreen(),
         // '/login': (context) => const LoginScreen(),

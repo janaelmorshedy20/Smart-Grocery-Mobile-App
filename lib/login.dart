@@ -58,7 +58,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('An error occurred: ${e.message}'),
+              content: Text('Invalid email or password'),
               backgroundColor: Colors.red,
             ),
           );
