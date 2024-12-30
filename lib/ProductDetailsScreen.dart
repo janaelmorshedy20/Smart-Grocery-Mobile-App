@@ -155,35 +155,25 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
                 // Buy Now Button
                 ElevatedButton(
-<<<<<<< HEAD
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.green, // Sets the green color
-    minimumSize: const Size(double.infinity, 50), // Button width fills parent, height is 50
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20), // Matches the rounded corners
-    ),
-  ),
-  onPressed: () {},
-  child: const Text(
-    'Buy Now', // Change the text to 'Login'
-    style: TextStyle(
-      color: Colors.white, // White text color
-      fontSize: 16, // Adjust font size if needed
-    ),
-  ),
-),
-=======
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.green, // Sets the green color
+                    minimumSize: const Size(double.infinity, 50), // Button width fills parent, height is 50
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20), // Matches the rounded corners
+                    ),
                   ),
                   onPressed: () {
                     // Add the product to the cart
                     ref.read(cartProvider.notifier).addProduct(product);
                   },
-                  child: const Text('Buy Now'),
+                  child: const Text(
+                    'Buy Now', // Change the text to 'Login'
+                    style: TextStyle(
+                      color: Colors.white, // White text color
+                      fontSize: 16, // Adjust font size if needed
+                    ),
+                  ),
                 ),
-
                 // Go to Favorite List Button
                 const SizedBox(height: 20),
                 ElevatedButton(
@@ -201,7 +191,6 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   },
                   child: const Text('Go to Favorites'),
                 ),
->>>>>>> b8fa655d0c9d20c25b0f132ff95437519994291f
               ],
             ),
           );
