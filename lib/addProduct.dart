@@ -27,13 +27,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   Future<void> _getCategories() async {
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('categories').get();
+      final snapshot = await FirebaseFirestore.instance.collection('categories').get();
 
       setState(() {
         _categories = snapshot.docs
             .map((doc) => Category.fromMap(
-                doc.data())) // Assuming Category has a fromMap method
+                doc.data())) 
             .toList();
       });
     } catch (e) {
@@ -43,7 +42,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
-  // Method to add product to Firestore
   Future<void> addProductToFirebase() async {
     if (_nameController.text.isEmpty ||
         _priceController.text.isEmpty ||
@@ -88,11 +86,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     try {
       final product = Product(
-        id: '', // You can use an auto-generated ID or leave it blank for Firestore to generate one
+        id: '', 
         name: _nameController.text,
         price: double.tryParse(_priceController.text) ?? 0.0,
         detail: _detailController.text,
-        category: _selectedCategory!, // Category selected by the user
+        category: _selectedCategory!,
         // createdAt: Timestamp.now(),
       );
 
@@ -101,12 +99,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
           .collection('products')
           .add(product.toMap());
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Product added successfully!')),
       );
 
-      // Clear fields after successful addition
       _nameController.clear();
       _priceController.clear();
       _detailController.clear();

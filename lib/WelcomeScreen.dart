@@ -44,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                   color: Colors.green,
                 ),),
                 
-                const SizedBox(height: 450),
+                const SizedBox(height: 250),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
