@@ -1,17 +1,22 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smartgrocery/cart_screen.dart';
+import 'package:smartgrocery/favoritelist.dart'; // Import the FavoriteListScreen
+import 'package:smartgrocery/provider/cartprovider.dart';
+import 'package:smartgrocery/provider/favoriteprovider.dart';
 import 'models/Product.dart';
 
-class ProductDetailsScreen extends StatefulWidget {
+class ProductDetailsScreen extends ConsumerStatefulWidget {
   final String productId;
 
   const ProductDetailsScreen({super.key, required this.productId});
 
   @override
-  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+  _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   late Future<Product> _product;
 
   @override
@@ -19,7 +24,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     super.initState();
     _product = getProductDetailsFromFirestore(widget.productId);
   }
-  
+
   Future<Product> getProductDetailsFromFirestore(String productId) async {
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -51,7 +56,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.favorite_border),
-            onPressed: () {},
+            onPressed: () {
+              // Access snapshot data here inside builder function
+              _product.then((product) {
+                ref.read(favoriteProvider.notifier).addProduct(product);
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.shopping_cart, // Cart icon
+              color: Colors.green, // Cart icon color
+            ),
+            onPressed: () {
+              // Navigate to the Cart Screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -82,10 +105,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    // image: DecorationImage(
-                    //   image: NetworkImage(product.imageUrl), 
-                    //   fit: BoxFit.cover,
-                    // ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -98,8 +117,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // Text('Weight: ${product.weight}', style: const TextStyle(color: Colors.grey)),
-                // const SizedBox(height: 10),
 
                 // Price and Quantity Selector
                 Row(
@@ -107,14 +124,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     Row(
                       children: [
-                        // Text(
-                        //   '\$${product.originalPrice}',
-                        //   style: const TextStyle(
-                        //     fontSize: 18,
-                        //     decoration: TextDecoration.lineThrough,
-                        //     color: Colors.grey,
-                        //   ),
-                        // ),
                         Text(
                           '${product.price}\EGP',
                           style: const TextStyle(
@@ -122,27 +131,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             fontWeight: FontWeight.bold,
                             color: Colors.green,
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              if (quantity > 1) quantity--;
-                            });
-                          },
-                          icon: const Icon(Icons.remove),
-                        ),
-                        Text('$quantity'),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              quantity++;
-                            });
-                          },
-                          icon: const Icon(Icons.add),
                         ),
                       ],
                     ),
@@ -165,30 +153,35 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // // Review Section
-                // const Text(
-                //   'Review',
-                //   style: TextStyle(
-                //     fontSize: 16,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
-                // const SizedBox(height: 5),
-                // Row(
-                //   children: List.generate(5, (index) {
-                //     return const Icon(Icons.star, color: Colors.amber);
-                //   }),
-                // ),
-                // const Spacer(),
-
                 // Buy Now Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Add the product to the cart
+                    ref.read(cartProvider.notifier).addProduct(product);
+                  },
                   child: const Text('Buy Now'),
+                ),
+
+                // Go to Favorite List Button
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  onPressed: () {
+                    // Navigate to the Favorite List Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FavoriteListScreen()),
+                    );
+                  },
+                  child: const Text('Go to Favorites'),
                 ),
               ],
             ),
