@@ -68,6 +68,18 @@ flutter:
   assets:
     - assets\nn.jpg
     - assets\a2.PNG
+    - assets\bundle-pack.jpg
+    - assets\medium_spice.jpg
+    - assets\fruit-basket.webp
+    - assets\Healthy-pack.PNG
+    - assets\icecream.jpeg
+    - assets\vanilla_icecream.jpg
+    - assets\juice.jpg
+    - assets\milk.jpg
+    - assets\meat.jpg
+    - assets\banner.PNG
+    - assets\ferrero rocher.jpg
+    - assets\twix.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
