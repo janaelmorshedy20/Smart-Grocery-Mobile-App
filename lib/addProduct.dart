@@ -18,20 +18,22 @@ class _AddProductScreenState extends State<AddProductScreen> {
   bool _isLoading = false;
 
   List<Category> _categories = [];
-  
+
   @override
   void initState() {
     super.initState();
-    _getCategories(); 
+    _getCategories();
   }
 
   Future<void> _getCategories() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('categories').get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('categories').get();
 
       setState(() {
         _categories = snapshot.docs
-            .map((doc) => Category.fromMap(doc.data())) // Assuming Category has a fromMap method
+            .map((doc) => Category.fromMap(
+                doc.data())) // Assuming Category has a fromMap method
             .toList();
       });
     } catch (e) {
@@ -52,17 +54,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
       return;
     }
 
+// Price validation: check if it's a positive number
+    final price = double.tryParse(_priceController.text);
+    if (price == null || price <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("The price should be a positive number")),
+      );
+      return;
+    }
     setState(() {
       _isLoading = true;
     });
 
     try {
       final product = Product(
-        id: '',  // You can use an auto-generated ID or leave it blank for Firestore to generate one
+        id: '', // You can use an auto-generated ID or leave it blank for Firestore to generate one
         name: _nameController.text,
         price: double.tryParse(_priceController.text) ?? 0.0,
         detail: _detailController.text,
-        category: _selectedCategory!,  // Category selected by the user
+        category: _selectedCategory!, // Category selected by the user
         // createdAt: Timestamp.now(),
       );
 
@@ -204,7 +214,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
           Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 backgroundColor: Colors.green,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
