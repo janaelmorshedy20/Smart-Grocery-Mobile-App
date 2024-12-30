@@ -53,7 +53,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
             return GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ProductsScreen(),),);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductsScreen(),),);
                 setState(() {
                   selectedIndex = index;
                 });

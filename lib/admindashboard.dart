@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'addProduct.dart';
+import 'products.dart';
 
 
 class AdminDashboard extends StatelessWidget {
@@ -29,13 +29,45 @@ class AdminDashboard extends StatelessWidget {
           Container(
             color: Colors.green.shade100,
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Categories'),
-                Text('Products'),
-                Text('Orders'),
+                _buildHeaderItem(
+                  context,
+                  title: 'Dashboard',
+                  onTap: () {
+                    // Navigate to Dashboard or home page
+                    print('Dashboard clicked');
+                  },
+                ),
+                _buildHeaderItem(
+                  context,
+                  title: 'Categories',
+                  onTap: () {
+                    // Navigate to Categories Page
+                    print('Categories clicked');
+                  },
+                ),
+                _buildHeaderItem(
+                  context,
+                  title: 'Products',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductsPage(),
+                      ),
+                    );
+                  },
+                ),
+                _buildHeaderItem(
+                  context,
+                  title: 'Orders',
+                  onTap: () {
+                    // Navigate to Orders Page
+                    print('Orders clicked');
+                  },
+                ),
               ],
             ),
           ),
@@ -109,6 +141,22 @@ class AdminDashboard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildHeaderItem(
+    BuildContext context, {
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
     );
   }

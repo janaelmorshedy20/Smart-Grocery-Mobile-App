@@ -3,7 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smartgrocery/signup.dart';
 import 'package:smartgrocery/welcomescreen.dart';
-import 'package:smartgrocery/admindashboard.dart'; // Import the Admin Dashboard screen
+import 'package:smartgrocery/admindashboard.dart';
+
+import 'HomePage.dart'; // Import the Admin Dashboard screen
 
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
@@ -44,7 +46,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
         // Navigate to the general welcome screen after successful login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => WelcomeScreen()), // Replace with your actual home/dashboard screen
+          MaterialPageRoute(builder: (context) => const HomePage()), // Replace with your actual home/dashboard screen
         );
       } on FirebaseAuthException catch (e) {
         // Handle login errors (e.g., invalid email or password)

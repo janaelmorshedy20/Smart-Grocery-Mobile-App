@@ -65,11 +65,10 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           ),
           IconButton(
             icon: const Icon(
-              Icons.shopping_cart, // Cart icon
-              color: Colors.green, // Cart icon color
+              Icons.shopping_cart, 
+              color: Colors.green,
             ),
             onPressed: () {
-              // Navigate to the Cart Screen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const CartScreen()),
@@ -137,8 +136,6 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-
-                // Product Details
                 const Text(
                   'Product Details',
                   style: TextStyle(
@@ -152,14 +149,12 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
-
-                // Buy Now Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Sets the green color
+                    backgroundColor: Colors.green, 
                     minimumSize: const Size(double.infinity, 50), // Button width fills parent, height is 50
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), // Matches the rounded corners
+                      borderRadius: BorderRadius.circular(20), 
                     ),
                   ),
                   onPressed: () {
@@ -167,14 +162,13 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     ref.read(cartProvider.notifier).addProduct(product);
                   },
                   child: const Text(
-                    'Buy Now', // Change the text to 'Login'
+                    'Buy Now',
                     style: TextStyle(
-                      color: Colors.white, // White text color
-                      fontSize: 16, // Adjust font size if needed
+                      color: Colors.white, 
+                      fontSize: 16, 
                     ),
                   ),
                 ),
-                // Go to Favorite List Button
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -182,7 +176,6 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   onPressed: () {
-                    // Navigate to the Favorite List Screen
                     Navigator.push(
                       context,
                       MaterialPageRoute(

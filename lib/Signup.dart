@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/welcomescreen.dart';
 
+import 'HomePage.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -31,7 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                WelcomeScreen()), // Replace with your actual welcome screen
+                const HomePage()), // Replace with your actual welcome screen
       );
     } on FirebaseAuthException catch (e) {
       // Handle the case when the email is already in use

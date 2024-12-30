@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
-import 'package:smartgrocery/admindashboard.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:smartgrocery/HomePage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smartgrocery/WelcomeScreen.dart';
-import 'Signup.dart';
+import 'HomePage.dart';
+import 'products.dart';
+import 'signup.dart';
 import 'Login.dart';
-import 'WelcomeScreen.dart';
-import 'CategoryScreen.dart';
-import 'ProductsScreen.dart';
-import 'ProductDetailsScreen.dart';
+import 'welcomeScreen.dart';
+import 'categoryScreen.dart';
+import 'productsScreen.dart';
+import 'productDetailsScreen.dart';
 import 'addProduct.dart';
-import 'package:smartgrocery/admindashboard.dart';
+import 'admindashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();// Ensures proper widget binding for async operations
-   await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp(); // Initialize Firebase
   
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,DeviceOrientation.portraitDown,DeviceOrientation.landscapeRight,  DeviceOrientation.landscapeLeft, // Locking to portrait mode
@@ -54,6 +52,7 @@ class MyApp extends StatelessWidget {
         '/productDetails': (context) => const ProductDetailsScreen(productId: 'wCHMHvZQ2GhBdP7c5oaw'),
         '/addProduct': (context) => const AddProductScreen(),
         '/admindashboard': (context) => AdminDashboard(),
+        '/adminProducts': (context) => const ProductsPage(),
       },
     );
   }
