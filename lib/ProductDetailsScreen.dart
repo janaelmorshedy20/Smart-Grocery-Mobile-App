@@ -183,13 +183,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 // Buy Now Button
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: () {},
-                  child: const Text('Buy Now'),
-                ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.green, // Sets the green color
+    minimumSize: const Size(double.infinity, 50), // Button width fills parent, height is 50
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20), // Matches the rounded corners
+    ),
+  ),
+  onPressed: () {},
+  child: const Text(
+    'Buy Now', // Change the text to 'Login'
+    style: TextStyle(
+      color: Colors.white, // White text color
+      fontSize: 16, // Adjust font size if needed
+    ),
+  ),
+),
               ],
             ),
           );

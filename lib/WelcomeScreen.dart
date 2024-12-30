@@ -1,7 +1,6 @@
 // welcome_screen.dart
 import 'package:flutter/material.dart';
-import 'package:smartgrocery/Login1.dart';
-import 'package:smartgrocery/Login2.dart';
+import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/signup.dart';
 
 
@@ -18,7 +17,6 @@ class WelcomeScreen extends StatelessWidget {
          Image.asset(
           'assets/nn.jpg',  
           fit: BoxFit.fill
-
                ),
 
           

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smartgrocery/Login2.dart';
+import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/welcomescreen.dart';
 
 class SignUpScreen extends StatefulWidget {
