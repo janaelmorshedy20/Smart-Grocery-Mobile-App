@@ -3,6 +3,7 @@ import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
 import 'package:smartgrocery/admindashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:smartgrocery/HomePage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/WelcomeScreen.dart';
 import 'Signup.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         // '/login': (context) => const LoginScreen(),
         '/login2': (context) => const LoginScreen2(),
         '/welcome': (context) => const WelcomeScreen(),
+        '/HomePage': (context) => const HomePage(),
         '/categories': (context) => const CategoryScreen(),
         '/products': (context) => const ProductsScreen(),
         '/productDetails': (context) => const ProductDetailsScreen(productId: 'wCHMHvZQ2GhBdP7c5oaw'),
