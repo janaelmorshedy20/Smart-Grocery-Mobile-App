@@ -9,7 +9,8 @@ class FavoriteProvider extends StateNotifier<List<Product>> {
   // Add product to the favorites list
   void addProduct(Product product) {
     // Check if the product is already in the favorites list
-    final existingProductIndex = state.indexWhere((item) => item.id == product.id);
+    final existingProductIndex =
+        state.indexWhere((item) => item.id == product.id);
 
     if (existingProductIndex == -1) {
       // If the product doesn't exist, add it to the favorites list
@@ -24,6 +25,7 @@ class FavoriteProvider extends StateNotifier<List<Product>> {
 }
 
 // Define a global provider for Favorites
-final favoriteProvider = StateNotifierProvider<FavoriteProvider, List<Product>>((ref) {
+final favoriteProvider =
+    StateNotifierProvider<FavoriteProvider, List<Product>>((ref) {
   return FavoriteProvider();
 });

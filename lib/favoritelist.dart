@@ -12,23 +12,25 @@ class FavoriteListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: const Text('Favorites',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
+        elevation: 4,
       ),
       body: favoriteItems.isEmpty
-          ? const Center(child: Text('No favorites yet'))
+          ? const Center(
+              child: Text('No favorites yet',
+                  style: TextStyle(fontSize: 18, color: Colors.grey)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Display favorite items
                   ...favoriteItems
                       .map((product) => _buildFavoriteItem(product, ref))
                       .toList(),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -48,50 +50,98 @@ class FavoriteListScreen extends ConsumerWidget {
   }
 
   Widget _buildFavoriteItem(Product product, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 6.0,
-            offset: Offset(0, 4),
+    return Dismissible(
+      key: Key(product.id), // Unique key for each product
+      direction: DismissDirection.endToStart, // Swipe from right to left
+      onDismissed: (direction) {
+        ref
+            .read(favoriteProvider.notifier)
+            .removeProduct(product); // Remove from favorites
+        ScaffoldMessenger.of(ref.context).showSnackBar(
+          SnackBar(
+            content: Text('${product.name} removed from favorites!'),
+            duration: const Duration(seconds: 2),
           ),
-        ],
+        );
+      },
+      background: Container(
+        decoration: BoxDecoration(
+          color: Colors.red, // Background color for the swipe
+          borderRadius:
+              BorderRadius.circular(16.0), // Rounded edges for the swipe action
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20.0),
+        child: const Icon(Icons.delete, color: Colors.white, size: 32),
       ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 30,
-            backgroundImage: AssetImage('assets/product.png'),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+            minHeight:
+                120), // Ensure both the container and swipe area have equal height
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          margin: const EdgeInsets.symmetric(vertical: 12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.circular(16.0), // Rounded corners for the item
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 8.0,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(product.name,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(product.detail,
-                    style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: const CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage('assets/product.png'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      product.detail,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '${product.price} EGP',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Text('${product.price} EGP',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 10),
-          IconButton(
-            onPressed: () {
-              ref.read(favoriteProvider.notifier).removeProduct(product);
-            },
-            icon: const Icon(Icons.delete, color: Colors.red),
-          ),
-        ],
+        ),
       ),
     );
   }

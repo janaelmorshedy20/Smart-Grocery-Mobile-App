@@ -18,6 +18,7 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   late Future<Product> _product;
+  bool isFavorite = false; // Track if the product is in the favorites list
 
   @override
   void initState() {
@@ -55,17 +56,38 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
         foregroundColor: Colors.black,
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border),
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite ? Colors.red : Colors.black,
+            ),
             onPressed: () {
-              // Access snapshot data here inside builder function
               _product.then((product) {
-                ref.read(favoriteProvider.notifier).addProduct(product);
+                // Toggle the favorite status and update the provider
+                if (isFavorite) {
+                  ref.read(favoriteProvider.notifier).removeProduct(product);
+                } else {
+                  ref.read(favoriteProvider.notifier).addProduct(product);
+                }
+                setState(() {
+                  isFavorite = !isFavorite; // Toggle the heart icon state
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isFavorite
+                          ? '${product.name} added to favorites!'
+                          : '${product.name} removed from favorites!',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
               });
             },
           ),
           IconButton(
             icon: const Icon(
-              Icons.shopping_cart, 
+              Icons.shopping_cart,
               color: Colors.green,
             ),
             onPressed: () {
@@ -151,21 +173,27 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, 
-                    minimumSize: const Size(double.infinity, 50), // Button width fills parent, height is 50
+                    backgroundColor: Colors.green,
+                    minimumSize: const Size(double.infinity,
+                        50), // Button width fills parent, height is 50
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20), 
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   onPressed: () {
-                    // Add the product to the cart
                     ref.read(cartProvider.notifier).addProduct(product);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${product.name} added to cart!'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   },
                   child: const Text(
-                    'Buy Now',
+                    'Add To Cart',
                     style: TextStyle(
-                      color: Colors.white, 
-                      fontSize: 16, 
+                      color: Colors.white,
+                      fontSize: 16,
                     ),
                   ),
                 ),
