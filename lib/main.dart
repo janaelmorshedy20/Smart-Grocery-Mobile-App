@@ -3,6 +3,7 @@ import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'HomePage.dart';
+import 'ocr.dart';
 import 'products.dart';
 import 'signup.dart';
 import 'Login.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         '/addProduct': (context) => const AddProductScreen(),
         '/admindashboard': (context) => AdminDashboard(),
         '/adminProducts': (context) => const ProductsPage(),
+        '/ocr': (context) => ShoppingListScreen(),
       },
     );
   }
