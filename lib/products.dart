@@ -9,7 +9,7 @@ class ProductsPage extends StatelessWidget {
         .collection('products') // Collection name should match your Firestore setup
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => {'id': doc.id, ...doc.data()} as Map<String, dynamic>)
+            .map((doc) => {'id': doc.id, ...doc.data()})
             .toList());
   }
 

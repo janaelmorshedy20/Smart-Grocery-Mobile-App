@@ -292,9 +292,9 @@ class ShoppingListScreen extends StatefulWidget {
 }
 
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
-  List<Map<String, dynamic>> shoppingList = [];
+  List shoppingList = [];
   String selectedFrequency = 'None'; // Default frequency
-  String _recognizedText = 'Scanned text will appear here.'; // OCR result
+  String _recognizedText = ''; // OCR result
 
   //File? _selectedImage;
 
@@ -318,12 +318,18 @@ File? file;
     final textRecognizer = TextRecognizer();
 
     try {
-      final RecognizedText recognizedText =
-          await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+       // Process text into individual lines and update the shopping list
+    final lines = recognizedText.text.split('\n'); // Split text by lines
       setState(() {
-        _recognizedText = recognizedText.text.isNotEmpty
-            ? recognizedText.text
-            : 'No text recognized.';
+        // _recognizedText = recognizedText.text.isNotEmpty ? recognizedText.text : 'No text recognized.';
+        shoppingList = lines
+          .where((line) => line.trim().isNotEmpty) // Filter out empty lines
+          .map((line) => {'title': line}) 
+          .toList();
+
+          // .map((line) => {'title': line, 'price': 0.0}) // Add default price
       });
     } catch (e) {
       setState(() {
@@ -392,11 +398,46 @@ File? file;
       ),
       body: Column(
         children: [
-            MaterialButton(onPressed: () async{
+            // MaterialButton(onPressed: () async{
+            //     await _processImage();
+            // }, child: const Text("Get Image"),),
+            // if(file != null) Image.file(file!, width: 200,height: 200,fit: BoxFit.fill),
+            const SizedBox(height: 20),
+            GestureDetector(
+              child: Center(
+                child: Container(
+                  width: 210,
+                  height: 210,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey, width: 2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (file != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16), // Match border radius
+                          child: Image.file(file!, width: 210, height: 210, fit: BoxFit.fill,),
+                        )
+                      else
+                        const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_a_photo, color: Colors.grey),
+                            SizedBox(height: 8),
+                            Text('Upload Image', style: TextStyle(color: Colors.grey, fontSize: 14),),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              onTap: () async {
                 await _processImage();
-            }, child: const Text("Get Image"),),
-            if(file != null) Image.file(file!, width: 200,height: 200,fit: BoxFit.fill)
-            ,
+              },
+          ),
+
 
           // Display captured or selected image
           // if (_selectedImage != null)
@@ -406,14 +447,16 @@ File? file;
           //   ),
 
           // Display recognized text
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              _recognizedText,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-
+          // Padding(
+          //   padding: const EdgeInsets.all(16.0),
+          //   child: Text(
+          //     _recognizedText,
+          //     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          //   ),
+          // ),
+          const SizedBox(height: 10),
+          const Text("Your Shopping List", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+          const SizedBox(height: 10),
           // Shopping list
           Expanded(
             child: ListView.builder(
@@ -422,7 +465,7 @@ File? file;
                 final item = shoppingList[index];
                 return ListTile(
                   title: Text(item['title']),
-                  subtitle: Text('\$${item['price']}'),
+                  // subtitle: Text('\$${item['price']}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _deleteItem(index),
