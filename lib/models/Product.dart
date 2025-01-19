@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
+// import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'Category.dart';
 
-const uuid= Uuid();
+// const uuid = Uuid();
 final formatter = DateFormat('yyyy-MM-dd');
 
 class Product {
@@ -12,17 +12,18 @@ class Product {
   final double price;
   final String detail;
   final Category category;
-  final double weight; 
+  final double weight;
   final int quantity;
-  final DateTime productionDate; 
-  final DateTime expireDate; 
+  final DateTime productionDate;
+  final DateTime expireDate;
   final bool isOnSale;
   final double newPrice;
-  final bool isAllergenic; 
+  final bool isAllergenic;
   //final String? imageUrl;
 
   Product({
-    String? id, // Optional; generates a new UUID if not provided
+    // String? id, // Optional; generates a new UUID if not provided
+    required this.id,
     required this.name,
     required this.price,
     required this.detail,
@@ -35,12 +36,13 @@ class Product {
     required this.newPrice,
     required this.isAllergenic,
     //this.imageUrl,
-  }): id = id ?? uuid.v4(); // Automatically generates a UUID if id is null
+  });
+  // : id = id ?? uuid.v4(); // Automatically generates a UUID if id is null
 
   // Convert a Product object to a Map for Firestore
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      // 'id': id,
       'name': name,
       'price': price,
       'detail': detail,
@@ -50,7 +52,7 @@ class Product {
       'productionDate': formatter.format(productionDate),
       'dateOfExpire': formatter.format(expireDate),
       'isOnSale': isOnSale,
-      'newPrice':newPrice,
+      'newPrice': newPrice,
       'isAllergenic': isAllergenic,
       // 'imageUrl': imageUrl,
     };
@@ -60,15 +62,20 @@ class Product {
   factory Product.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
     return Product(
-      id: data['id'] ?? uuid.v4(), // Generates UUID if missing
+      id: snapshot.id,
+      // id: data['id'] ?? uuid.v4(), // Generates UUID if missing
       name: data['name'] ?? '',
       price: (data['price'] ?? 0.0).toDouble(),
       detail: data['detail'] ?? '',
       category: Category.fromMap(data['category'] ?? {}),
       weight: (data['weight'] ?? 0.000).toDouble(),
       quantity: data['quantity'] ?? 0,
-      productionDate: data['dateOfProduction'] != null ? formatter.parse(data['dateOfProduction']): DateTime.now(),
-      expireDate: data['dateOfExpire'] != null ? formatter.parse(data['dateOfExpire']): DateTime.now(),
+      productionDate: data['dateOfProduction'] != null
+          ? formatter.parse(data['dateOfProduction'])
+          : DateTime.now(),
+      expireDate: data['dateOfExpire'] != null
+          ? formatter.parse(data['dateOfExpire'])
+          : DateTime.now(),
       isOnSale: data['isOnSale'] ?? false,
       newPrice: (data['newPrice'] ?? 0.0).toDouble(),
       isAllergenic: data['isAllergenic'] ?? false,

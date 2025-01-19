@@ -11,9 +11,7 @@ class ProductsScreen extends StatelessWidget {
     return FirebaseFirestore.instance
         .collection('products') 
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Product.fromSnapshot(doc))
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList());
   }
 
   @override
