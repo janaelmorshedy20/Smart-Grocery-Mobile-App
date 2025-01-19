@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/provider/cartprovider.dart';
 import 'models/Product.dart';
+import 'models/Cart.dart'; // Import the Cart model
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -67,20 +69,17 @@ class CartScreen extends ConsumerWidget {
                   const SizedBox(height: 20),
 
                   // Price Details
-                  Text('Total Item            ${cartItems.length}'),
+                  Text('Total Items: ${cartItems.length}'),
                   const SizedBox(height: 10),
 
-                  Text(
-                      'Price                     \$${totalPrice.toStringAsFixed(2)}',
+                  Text('Price: \$${totalPrice.toStringAsFixed(2)}',
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text(
-                      'Discount                \$${discount.toStringAsFixed(2)}',
+                  Text('Discount: \$${discount.toStringAsFixed(2)}',
                       style: const TextStyle(
                           decoration: TextDecoration.lineThrough)),
                   const SizedBox(height: 10),
-                  Text(
-                      'Total Price            \$${finalPrice.toStringAsFixed(2)}',
+                  Text('Total Price: \$${finalPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 20),
@@ -91,7 +90,9 @@ class CartScreen extends ConsumerWidget {
                       backgroundColor: Colors.green,
                       minimumSize: const Size(double.infinity, 50),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _checkout(context, cartItems, finalPrice);
+                    },
                     child: const Text('Checkout'),
                   ),
                 ],
@@ -110,6 +111,51 @@ class CartScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _checkout(
+      BuildContext context, List<Product> cartItems, double finalPrice) {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    Cart newCart = Cart(
+      id: '',
+      name: 'User Cart', // You can customize this as needed
+      price: finalPrice,
+      totalprice: finalPrice,
+    );
+
+    // Create a reference to the Firestore 'carts' collection
+    final cartRef = firestore.collection('carts').doc();
+
+    // Prepare the data for saving
+    List<Map<String, dynamic>> productData = cartItems.map((product) {
+      return {
+        'name': product.name,
+        'price': product.price,
+      };
+    }).toList();
+
+    // Prepare the data to be saved, including the products and total price
+    final cartData = {
+      'totalprice': finalPrice,
+      'products': productData,
+    };
+
+    // Save the cart data to Firestore
+    cartRef.set(cartData).then((_) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cart saved successfully!'),
+        ),
+      );
+      // You can navigate the user to a different page (e.g., Order Confirmation) here
+    }).catchError((error) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    });
   }
 
   // Pass ref to _buildCartItem to allow access to the provider
