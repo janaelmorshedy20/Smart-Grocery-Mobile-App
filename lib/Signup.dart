@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/welcomescreen.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';  // for utf8.encode()
+
 
 import 'HomePage.dart';
 
@@ -17,16 +21,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
+  final _phonenumberController= TextEditingController();
+  
+
   bool _obscurePassword = true;
   String _errorMessage = ''; // This will store the error message
-
+String hashPassword(String password) {
+  final bytes = utf8.encode(password);  // Convert password to bytes
+  final digest = sha256.convert(bytes); // Generate SHA-256 hash
+  return digest.toString();  // Return the hashed password as a string
+}
   Future Signup() async {
     try {
+      String hashedPassword = hashPassword(_passwordController.text.trim());
       // Check if the email is already in use by attempting to create the user
+      UserCredential userCredential =
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+       String uid = userCredential.user!.uid;
+       await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'name': _nameController.text.trim(),
+        'phone': _phonenumberController.text.trim(),
+        'email': _emailController.text.trim(),
+        'password': hashedPassword,
+      });
 
       // Navigate to welcome screen on successful sign-up
       Navigator.pushReplacement(
@@ -121,7 +141,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value == null || value.isEmpty) {
                       return "Please enter your email";
                     }
-
                     String emailPattern =
                         r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
                     RegExp regExp = RegExp(emailPattern);
@@ -133,6 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
+                  controller: _phonenumberController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: 'Phone Number',
