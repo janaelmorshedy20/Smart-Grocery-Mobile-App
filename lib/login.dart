@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:smartgrocery/ProductsScreen.dart';
 import 'package:smartgrocery/signup.dart';
-import 'package:smartgrocery/welcomescreen.dart';
 import 'package:smartgrocery/admindashboard.dart';
-
-import 'HomePage.dart'; // Import the Admin Dashboard screen
+import 'package:smartgrocery/HomePage.dart'; // Import the HomePage
 
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
@@ -24,7 +22,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
 
   final String adminEmail = "admin@gmail.com";
   final String adminPassword = "admin123";
- 
+
   Future login() async {
     // Check if the provided email and password match the admin credentials
     if (_emailController.text.trim() == adminEmail && _passwordController.text.trim() == adminPassword) {
@@ -38,34 +36,39 @@ class _LoginScreenV2State extends State<LoginScreen2> {
     } else {
       // Try to sign in with Firebase Authentication if not admin
       try {
+        print('Starting Firebase operation');
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        print('Firebase operation complete');
 
-        // Navigate to the general welcome screen after successful login
+        // Navigate to the HomePage if login is successful
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()), // Replace with your actual home/dashboard screen
+          MaterialPageRoute(builder: (context) => const ProductsScreen()), // Navigate to HomePage
         );
       } on FirebaseAuthException catch (e) {
         // Handle login errors (e.g., invalid email or password)
-        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        print('Error during Firebase operation: $e');
+        if (e.code == 'wrong-password') {
+          // Show a custom SnackBar for wrong password
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid email or password'),
-              backgroundColor: Colors.red,
+            const SnackBar(
+              content: Text('Incorrect password! Please try again.'),
+              backgroundColor: Colors.orange,
             ),
           );
         } else {
+          // Default error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Invalid email or password'),
+              content: Text('Error: ${e.message}'),
               backgroundColor: Colors.red,
             ),
           );
         }
-      }               
+      }
     }
   }
 

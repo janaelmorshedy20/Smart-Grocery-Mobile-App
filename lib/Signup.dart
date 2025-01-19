@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/welcomescreen.dart';
 import 'package:crypto/crypto.dart';
-import 'dart:convert';  // for utf8.encode()
-
+import 'dart:convert'; // for utf8.encode()
 
 import 'HomePage.dart';
 
@@ -21,44 +20,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
-  final _phonenumberController= TextEditingController();
-  
+  final _phonenumberController = TextEditingController();
 
   bool _obscurePassword = true;
   String _errorMessage = ''; // This will store the error message
-String hashPassword(String password) {
-  final bytes = utf8.encode(password);  // Convert password to bytes
-  final digest = sha256.convert(bytes); // Generate SHA-256 hash
-  return digest.toString();  // Return the hashed password as a string
-}
+
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password); // Convert password to bytes
+    final digest = sha256.convert(bytes); // Generate SHA-256 hash
+    return digest.toString(); // Return the hashed password as a string
+  }
+
   Future Signup() async {
     try {
       String hashedPassword = hashPassword(_passwordController.text.trim());
-      // Check if the email is already in use by attempting to create the user
+      // Attempt to create the user with Firebase Authentication
       UserCredential userCredential =
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-       String uid = userCredential.user!.uid;
-       await FirebaseFirestore.instance.collection('users').doc(uid).set({
+
+      String uid = userCredential.user!.uid;
+
+      // Save user details to Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'name': _nameController.text.trim(),
         'phone': _phonenumberController.text.trim(),
         'email': _emailController.text.trim(),
         'password': hashedPassword,
       });
 
-      // Navigate to welcome screen on successful sign-up
+      // Navigate to LoginScreen2 on successful sign-up
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                const HomePage()), // Replace with your actual welcome screen
+                const LoginScreen2()), // Replace with your actual login screen
       );
     } on FirebaseAuthException catch (e) {
       // Handle the case when the email is already in use
       if (e.code == 'email-already-in-use') {
-        // You can show a message here (using Snackbar or a Text widget)
+        // Show an error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('The email address is already used.'),
@@ -141,13 +144,7 @@ String hashPassword(String password) {
                     if (value == null || value.isEmpty) {
                       return "Please enter your email";
                     }
-                    String emailPattern =
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                    RegExp regExp = RegExp(emailPattern);
-                    if (!regExp.hasMatch(value)) {
-                      return "Please enter a valid email address";
-                    }
-                    return null;
+                    return null; // Firebase handles email validation
                   },
                 ),
                 const SizedBox(height: 20),
@@ -274,10 +271,11 @@ String hashPassword(String password) {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LoginScreen2()),
+                            builder: (context) => const LoginScreen2(),
+                          ),
                         );
                       },
                       child: const Text(
