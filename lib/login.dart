@@ -152,22 +152,50 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                 ),
                 const SizedBox(height: 10),
 
-                // Forgot Password Link
+                       // Forgot Password Link
                 GestureDetector(
-                  onTap: () async {
-                    await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
-                  },
-                  child: const Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+  onTap: () async {
+    if (_emailController.text.isEmpty) {
+      // Show a message if the email field is empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter your email address.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: _emailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Password reset email sent successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  },
+    child: const Align(
+    alignment: Alignment.centerRight,
+    child: Text(
+      'Forgot Password?',
+      style: TextStyle(
+        color: Colors.green,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ),
+),
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {

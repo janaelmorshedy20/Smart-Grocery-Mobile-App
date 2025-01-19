@@ -161,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value == null || value.isEmpty) {
                       return "Please enter your phone number";
                     }
-                    if (value.length > 11) {
+                    if (value.length > 11 || value.length < 11 ) {
                       return "Phone Number must be at 11 characters";
                     }
                     return null;
