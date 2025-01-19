@@ -65,7 +65,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
             ),
           );
         }
-      }
+      }               
     }
   }
 
@@ -147,7 +147,25 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+
+                // Forgot Password Link
+                GestureDetector(
+                  onTap: () async {
+                    await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+                  },
+                  child: const Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
                     if (formstate.currentState!.validate()) {
