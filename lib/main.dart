@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smartgrocery/editprofile.dart';
+import 'package:smartgrocery/userprofile.dart';
 import 'HomePage.dart';
 import 'ocr.dart';
 import 'products.dart';
@@ -41,10 +43,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       
-      initialRoute: '/welcome', // Define the initial screen
+      initialRoute: '/login2', // Define the initial screen
       routes: {
         '/signup': (context) => const SignUpScreen(),
-        // '/login': (context) => const LoginScreen(),
         '/login2': (context) => const LoginScreen2(),
         '/welcome': (context) => const WelcomeScreen(),
         '/HomePage': (context) => const HomePage(),
@@ -55,6 +56,12 @@ class MyApp extends StatelessWidget {
         '/admindashboard': (context) => AdminDashboard(),
         '/adminProducts': (context) => const ProductsPage(),
         '/ocr': (context) => ShoppingListScreen(),
+        // '/userprofile': (context) =>const UserProfileScreen(),
+        // '/EditProfileScreen': (context) =>const EditProfileScreen(),
+
+        
+        
+
       },
     );
   }
