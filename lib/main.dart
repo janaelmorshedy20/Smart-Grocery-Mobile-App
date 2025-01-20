@@ -5,14 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/userprofile.dart';
 import 'HomePage.dart';
 import 'ocr.dart';
-import 'products.dart';
+import 'addproducts.dart';
 import 'signup.dart';
 import 'Login.dart';
 import 'welcomeScreen.dart';
 import 'categoryScreen.dart';
 import 'productsScreen.dart';
 import 'productDetailsScreen.dart';
-import 'addProduct.dart';
+import 'products.dart';
 import 'admindashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
 
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       initialRoute: isLoggedIn
-          ? (isAdmin ? '/admindashboard' : '/categories') // Admin gets admin dashboard
+          ? (isAdmin ? '/admindashboard' : '/userprofile') // Admin gets admin dashboard
           : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),

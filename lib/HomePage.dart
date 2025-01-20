@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smartgrocery/userprofile.dart';
 
 import 'categoryScreen.dart';
 import 'favoritelist.dart';
@@ -374,6 +375,11 @@ class _HomePageState extends State<HomePage> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+        );
+         case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UserProfileScreen()),
         );
         break;
       default:
