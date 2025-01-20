@@ -19,6 +19,7 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   late Future<Product> _product;
   bool isFavorite = false; // Track if the product is in the favorites list
+  int quantity = 1; // Initialize quantity
 
   @override
   void initState() {
@@ -42,8 +43,6 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       throw Exception("Error fetching product details: $e");
     }
   }
-
-  int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +120,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Image
+                // Product Image (currently not displayed)
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -139,25 +138,18 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   ),
                 ),
 
-                // Price and Quantity Selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          '${product.price}\EGP',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                // Price
+                Text(
+                  '${product.price} EGP',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
                 const SizedBox(height: 20),
+
+                // Product Details
                 const Text(
                   'Product Details',
                   style: TextStyle(
@@ -171,23 +163,80 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
+
+                // Quantity Selector (Below Product Description)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Quantity:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    IconButton(
+                      onPressed: () {
+                        if (quantity > 1) {
+                          setState(() {
+                            quantity--;
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.remove),
+                    ),
+                    Text('$quantity'),
+                    IconButton(
+                      onPressed: () {
+                        if (quantity < product.quantity) {
+                          setState(() {
+                            quantity++;
+                          });
+                        } else {
+                          // Show an error message if the quantity exceeds available stock
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Not enough stock available'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Add to Cart Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
-                    minimumSize: const Size(double.infinity,
-                        50), // Button width fills parent, height is 50
+                    minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                   onPressed: () {
-                    ref.read(cartProvider.notifier).addProduct(product);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${product.name} added to cart!'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    // Check if the quantity is within the available stock
+                    if (quantity <= product.quantity) {
+                      ref.read(cartProvider.notifier).addProduct(product, quantity); // Add product with quantity
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${product.name} added to cart!'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Not enough stock available'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     'Add To Cart',
@@ -198,6 +247,8 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Go to Favorites Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
