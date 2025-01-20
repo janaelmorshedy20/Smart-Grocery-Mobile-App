@@ -15,35 +15,39 @@ import 'productsScreen.dart';
 import 'productDetailsScreen.dart';
 import 'addProduct.dart';
 import 'admindashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();// Ensures proper widget binding for async operations
   await Firebase.initializeApp(); // Initialize Firebase
   
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,DeviceOrientation.portraitDown,DeviceOrientation.landscapeRight,  DeviceOrientation.landscapeLeft, // Locking to portrait mode
+    DeviceOrientation.portraitUp,DeviceOrientation.portraitDown,DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft, 
   ]).then((fn) {
     runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+      ProviderScope(
+        child: MyApp(isLoggedIn: isLoggedIn),
+      ),
+    );
   });
-} 
-class MyApp extends StatelessWidget {
+}
 
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  const MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      
-      initialRoute: '/signup', // Define the initial screen
+      initialRoute: isLoggedIn ? '/products' : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login2': (context) => const LoginScreen2(),
@@ -56,12 +60,8 @@ class MyApp extends StatelessWidget {
         '/admindashboard': (context) => AdminDashboard(),
         '/adminProducts': (context) => const ProductsPage(),
         '/ocr': (context) => ShoppingListScreen(),
-        // '/userprofile': (context) =>const UserProfileScreen(),
-        // '/EditProfileScreen': (context) =>const EditProfileScreen(),
-
-        
-        
-
+        '/userprofile': (context) => UserProfileScreen(),
+         
       },
     );
   }

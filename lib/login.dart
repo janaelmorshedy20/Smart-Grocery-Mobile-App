@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/ProductsScreen.dart';
 import 'package:smartgrocery/signup.dart';
 import 'package:smartgrocery/admindashboard.dart';
-import 'package:smartgrocery/HomePage.dart'; // Import the HomePage
 
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
@@ -14,12 +14,9 @@ class LoginScreen2 extends StatefulWidget {
 
 class _LoginScreenV2State extends State<LoginScreen2> {
   bool _obscurePassword = true;
-
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   final String adminEmail = "admin@gmail.com";
   final String adminPassword = "admin123";
 
@@ -30,7 +27,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => AdminDashboard(), // Navigate to admin dashboard
+          builder: (context) => AdminDashboard(),
         ),
       );
     } else {
@@ -42,6 +39,18 @@ class _LoginScreenV2State extends State<LoginScreen2> {
           password: _passwordController.text.trim(),
         );
         print('Firebase operation complete');
+
+        // Store user session using SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('uid', FirebaseAuth.instance.currentUser!.uid);
+
+        // Check session after login
+        bool? isLoggedIn = prefs.getBool('isLoggedIn');
+        String? uid = prefs.getString('uid');
+        print('isLoggedIn: $isLoggedIn');
+        print('User UID: $uid');
+
 
         // Navigate to the HomePage if login is successful
         Navigator.pushReplacement(
@@ -151,51 +160,46 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                   },
                 ),
                 const SizedBox(height: 10),
-
-                       // Forgot Password Link
                 GestureDetector(
-  onTap: () async {
-    if (_emailController.text.isEmpty) {
-      // Show a message if the email field is empty
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter your email address.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+                  onTap: () async {
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please enter your email address.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
 
-    try {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: _emailController.text);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Password reset email sent successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  },
-    child: const Align(
-    alignment: Alignment.centerRight,
-    child: Text(
-      'Forgot Password?',
-      style: TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
+                    try {
+                      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Password reset email sent successfully!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
