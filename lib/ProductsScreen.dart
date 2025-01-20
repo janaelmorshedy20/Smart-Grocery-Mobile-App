@@ -4,12 +4,16 @@ import 'ProductDetailsScreen.dart';
 import 'models/Product.dart';
 
 class ProductsScreen extends StatelessWidget {
-  const ProductsScreen({super.key});
+  
+  final String categoryId;
+
+  const ProductsScreen({Key? key, required this.categoryId}) : super(key: key);
+  // const ProductsScreen({super.key, required this.categoryId});
 
 
   Stream<List<Product>> getItemsFromFirestore() {
     return FirebaseFirestore.instance
-        .collection('products') 
+        .collection('products').where('category.id', isEqualTo: categoryId)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList());
   }
@@ -22,7 +26,9 @@ class ProductsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           "Products",

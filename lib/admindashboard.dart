@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'addCategory.dart';
 import 'addProduct.dart';
 import 'products.dart';
 
@@ -88,10 +89,9 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Categories',
                     value: '3',
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const CategoriesPage()),
-                      // );
+                     Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const AddCategoryScreen(),),
+                    );
                     },
                   ),
                   _buildDashboardCard(

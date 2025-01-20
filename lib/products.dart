@@ -13,14 +13,51 @@ class ProductsPage extends StatelessWidget {
             .toList());
   }
 
-  void deleteProduct(String productId) async {
-    try {
-      await FirebaseFirestore.instance.collection('products').doc(productId).delete();
-      print('Product deleted: $productId');
-    } catch (e) {
-      print('Error deleting product: $e');
-    }
+  // void deleteProduct(String productId) async {
+  //   try {
+  //     await FirebaseFirestore.instance.collection('products').doc(productId).delete();
+  //     print('Product deleted: $productId');
+  //   } catch (e) {
+  //     print('Error deleting product: $e');
+  //   }
+  // }
+
+
+  void deleteProduct(BuildContext context, Map<String, dynamic> product) async {
+  final productId = product['id'];
+
+  // Temporarily delete the product from Firestore
+  try {
+    await FirebaseFirestore.instance.collection('products').doc(productId).delete();
+
+    // Show a snackbar with undo action
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product['name']} deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () async {
+            // Restore the product to Firestore
+            await FirebaseFirestore.instance.collection('products').doc(productId).set(product);
+            print('Undo: ${product['name']} restored');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Undo: ${product['name']} restored')),
+            );
+          },
+        ),
+        duration: const Duration(seconds: 4), // Duration before snackbar disappears
+      ),
+    );
+
+    print('Product deleted: $productId');
+  } catch (e) {
+    print('Error deleting product: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error deleting ${product['name']}')),
+    );
   }
+}
+
 
   void editProduct(BuildContext context, Map<String, dynamic> product) {
     Navigator.push(
@@ -65,7 +102,7 @@ class ProductsPage extends StatelessWidget {
                 return _buildProductCard(
                   context,
                   product: product,
-                  onDelete: () => deleteProduct(product['id']),
+                  onDelete: () => deleteProduct(context, product),
                   onEdit: () => editProduct(context, product),
                 );
               },

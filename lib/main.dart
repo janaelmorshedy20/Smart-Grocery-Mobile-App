@@ -47,20 +47,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      initialRoute: isLoggedIn ? '/products' : '/login2', // Use '/HomePage' if user is logged in
+      initialRoute: isLoggedIn ? '/categories' : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login2': (context) => const LoginScreen2(),
         '/welcome': (context) => const WelcomeScreen(),
         '/HomePage': (context) => const HomePage(),
         '/categories': (context) => const CategoryScreen(),
-        '/products': (context) => const ProductsScreen(),
+        '/products': (context) => const ProductsScreen(categoryId: '',),
         '/productDetails': (context) => const ProductDetailsScreen(productId: 'wCHMHvZQ2GhBdP7c5oaw'),
         '/addProduct': (context) => const AddProductScreen(),
         '/admindashboard': (context) => AdminDashboard(),
         '/adminProducts': (context) => const ProductsPage(),
         '/ocr': (context) => ShoppingListScreen(),
-        '/userprofile': (context) => UserProfileScreen(),
+        '/userprofile': (context) => const UserProfileScreen(),
          
       },
     );

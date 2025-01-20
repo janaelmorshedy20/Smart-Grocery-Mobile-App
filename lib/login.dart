@@ -5,6 +5,8 @@ import 'package:smartgrocery/ProductsScreen.dart';
 import 'package:smartgrocery/signup.dart';
 import 'package:smartgrocery/admindashboard.dart';
 
+import 'CategoryScreen.dart';
+
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
 
@@ -55,7 +57,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
         // Navigate to the HomePage if login is successful
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ProductsScreen()), // Navigate to HomePage
+          MaterialPageRoute(builder: (context) => const CategoryScreen()), // Navigate to HomePage
         );
       } on FirebaseAuthException catch (e) {
         // Handle login errors (e.g., invalid email or password)

@@ -19,6 +19,7 @@ class Product {
   final bool isOnSale;
   final double newPrice;
   final bool isAllergenic;
+  final Timestamp createdAt;
   //final String? imageUrl;
 
   Product({
@@ -35,6 +36,7 @@ class Product {
     required this.isOnSale,
     required this.newPrice,
     required this.isAllergenic,
+    required this.createdAt,
     //this.imageUrl,
   });
   // : id = id ?? uuid.v4(); // Automatically generates a UUID if id is null
@@ -54,6 +56,7 @@ class Product {
       'isOnSale': isOnSale,
       'newPrice': newPrice,
       'isAllergenic': isAllergenic,
+      'createdAt': createdAt,
       // 'imageUrl': imageUrl,
     };
   }
@@ -79,6 +82,7 @@ class Product {
       isOnSale: data['isOnSale'] ?? false,
       newPrice: (data['newPrice'] ?? 0.0).toDouble(),
       isAllergenic: data['isAllergenic'] ?? false,
+      createdAt: data['createdAt'] ?? Timestamp.now(),
       // imageUrl: data['imageUrl'],
     );
   }

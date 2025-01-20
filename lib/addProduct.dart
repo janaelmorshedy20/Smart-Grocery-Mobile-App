@@ -22,8 +22,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _newPriceController = TextEditingController();
-  final TextEditingController _productionDateController =
-      TextEditingController();
+  final TextEditingController _productionDateController = TextEditingController();
   final TextEditingController _expireDateController = TextEditingController();
   Category? _selectedCategory;
 
@@ -52,7 +51,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
       setState(() {
         _categories =
-            snapshot.docs.map((doc) => Category.fromMap(doc.data())).toList();
+            snapshot.docs.map((doc) => Category.fromSnapshot(doc)).toList();
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -126,7 +125,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         newPrice:
             _isOnSale ? double.tryParse(_newPriceController.text) ?? 0.0 : 0.0,
         isAllergenic: _isAllergyCausing,
-        // createdAt: Timestamp.now(),
+        createdAt: Timestamp.now(),
       );
 
       // Add product data to Firestore
