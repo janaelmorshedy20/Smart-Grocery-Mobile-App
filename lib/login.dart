@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartgrocery/admindashboard.dart';
 import 'package:smartgrocery/CategoryScreen.dart';
 import 'package:smartgrocery/signup.dart';
-import 'package:smartgrocery/admindashboard.dart';
 
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
@@ -25,11 +25,13 @@ class _LoginScreenV2State extends State<LoginScreen2> {
     // Check if the provided email and password match the admin credentials
     if (_emailController.text.trim() == adminEmail &&
         _passwordController.text.trim() == adminPassword) {
-      // Admin login - Navigate to Admin Dashboard
       // Admin login - Store admin session
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isAdmin', true); // Save admin session
-      await prefs.setString('uid', FirebaseAuth.instance.currentUser!.uid); // Store static admin ID
+      await prefs.setString('uid', adminID); // Store static admin ID
+      await prefs.setBool('isLoggedIn', true); // Mark as logged in
+
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -39,23 +41,23 @@ class _LoginScreenV2State extends State<LoginScreen2> {
     } else {
       // Firebase authentication for regular users
       try {
-        print('Starting Firebase operation');
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        print('Firebase operation complete');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('uid', FirebaseAuth.instance.currentUser!.uid);
+
+        // Debug print to confirm session saving for regular user
+        print('User session saved: isLoggedIn = true, uid = ${FirebaseAuth.instance.currentUser!.uid}');
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const CategoryScreen()),
         );
       } on FirebaseAuthException catch (e) {
-        print('Error during Firebase operation: $e');
         if (e.code == 'wrong-password') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
