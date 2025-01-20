@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/Login.dart';
+import 'package:smartgrocery/models/Product.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
 
-import 'addProduct.dart';
 import 'products.dart';
+import 'addproducts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -65,7 +66,7 @@ class AdminDashboard extends StatelessWidget {
               children: [
                 _buildHeaderItem(
                   context,
-                  title: 'Categories',
+                  title: 'Add Categories',
                   onTap: () {
                     // Navigate to Categories Page
                     print('Categories clicked');
@@ -73,12 +74,12 @@ class AdminDashboard extends StatelessWidget {
                 ),
                 _buildHeaderItem(
                   context,
-                  title: 'Products',
+                  title: 'Add Products',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ProductsPage(),
+                        builder: (context) => AddProductScreen(),
                       ),
                     );
                   },
@@ -122,7 +123,7 @@ class AdminDashboard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AddProductScreen()),
+                            builder: (context) => ProductsPage()),
                       );
                     },
                   ),
