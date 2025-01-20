@@ -160,10 +160,16 @@ class ProductCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Placeholder(
-              fallbackHeight: 80,
-              fallbackWidth: 80,
-            ), // Replace this with an Image.asset or Image.network
+            product.imageUrl != ''? 
+                  Image.network(
+                    // "https://gralztxksbzwiprnipoj.supabase.co/storage/v1/object/public/images/products/test1",
+                    product.imageUrl,
+                    height: 80,
+                    width: 80,
+                    fit: BoxFit.cover,
+                  )
+                : const Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
+           // Replace this with an Image.asset or Image.network
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(

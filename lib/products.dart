@@ -9,9 +9,7 @@ class ProductsPage extends StatelessWidget {
     return FirebaseFirestore.instance
         .collection('products') // Collection name should match your Firestore setup
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => {'id': doc.id, ...doc.data()})
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
   }
 
   // void deleteProduct(String productId) async {
@@ -128,9 +126,9 @@ class ProductsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (product['image'] != null && product['image'].isNotEmpty)
+          if (product['imageUrl'] != null && product['imageUrl'].isNotEmpty)
             Image.network(
-              product['image'],
+              product['imageUrl'],
               height: 30,
               width: 30,
               fit: BoxFit.cover,

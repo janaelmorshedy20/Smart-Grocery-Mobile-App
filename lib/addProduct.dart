@@ -186,10 +186,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
     try {
       // final file = File(filePath);
-      final path = '/products/$fileName';
+      // final path = '/products/$fileName';
       await Supabase.instance.client.storage
           .from('images') // 'images' is your Supabase storage bucket name
-          .upload(path, file!)
+          .upload(fileName, file!)
            // ignore: avoid_print
           .then((value) => print("Image upload successful"));
 
