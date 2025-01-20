@@ -83,7 +83,28 @@ class Product {
       newPrice: (data['newPrice'] ?? 0.0).toDouble(),
       isAllergenic: data['isAllergenic'] ?? false,
       createdAt: data['createdAt'] ?? Timestamp.now(),
-      imageUrl: data['imageUrl'],
+      imageUrl: data['imageUrl'] ?? '', // Default empty string if 'imageUrl' is null
     );
   }
+
+  //  Product copyWith({
+  //   String? imageUrl,
+  // }) {
+  //   return Product(
+  //     id: id,
+  //     name: name,
+  //     price: price,
+  //     detail: detail,
+  //     category: category,
+  //     weight: weight,
+  //     quantity: quantity,
+  //     productionDate: productionDate,
+  //     expireDate: expireDate,
+  //     isOnSale: isOnSale,
+  //     newPrice: newPrice,
+  //     isAllergenic: isAllergenic,
+  //     createdAt: createdAt,
+  //     imageUrl: imageUrl ?? this.imageUrl,
+  //   );
+  // }
 }

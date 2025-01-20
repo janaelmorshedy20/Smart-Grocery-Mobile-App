@@ -23,8 +23,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _newPriceController = TextEditingController();
-  final TextEditingController _productionDateController =
-      TextEditingController();
+  final TextEditingController _productionDateController = TextEditingController();
   final TextEditingController _expireDateController = TextEditingController();
   Category? _selectedCategory;
 
@@ -114,7 +113,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     String fileName = _nameController.text;
     String imageUrl = await uploadImageToSupabase(fileName);
 
-   if (imageUrl == null || imageUrl == '') {
+   if (imageUrl == '') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter product image")),
       );
@@ -190,8 +189,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
       final path = '/products/$fileName';
       await Supabase.instance.client.storage
           .from('images') // 'images' is your Supabase storage bucket name
-          // ignore: avoid_print
           .upload(path, file!)
+           // ignore: avoid_print
           .then((value) => print("Image upload successful"));
 
       final imageUrl = Supabase.instance.client.storage
