@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smartgrocery/models/vouchers.dart'; // Import Voucher model
 
 class VouchersPage extends StatelessWidget {
-  const VouchersPage({Key? key}) : super(key: key);
+  const VouchersPage({super.key});
 
   @override
   Widget build(BuildContext context) {

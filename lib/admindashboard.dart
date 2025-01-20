@@ -9,6 +9,8 @@ import 'addProduct.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminDashboard extends StatelessWidget {
+  const AdminDashboard({super.key});
+
   // Fetch the user count from Firestore
   Future<int> getUserCount() async {
     try {
@@ -78,7 +80,7 @@ class AdminDashboard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddProductScreen(),
+                        builder: (context) => const AddProductScreen(),
                       ),
                     );
                   },
@@ -121,7 +123,7 @@ class AdminDashboard extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProductsPage()),
+                        MaterialPageRoute(builder: (context) => const ProductsPage()),
                       );
                     },
                   ),

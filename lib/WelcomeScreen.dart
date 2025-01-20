@@ -6,7 +6,7 @@ import 'package:smartgrocery/signup.dart';
 
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class WelcomeScreen extends StatelessWidget {
                     backgroundColor: Colors.white.withOpacity(0.10),
                      shape: RoundedRectangleBorder(
                        borderRadius: BorderRadius.circular(25), // Rounded corners
-                   side: BorderSide(
+                   side: const BorderSide(
                      color: Colors.white, // Border color
                            width: 1.5,)), // Border width
 

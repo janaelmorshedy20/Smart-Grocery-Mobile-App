@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UsersTableScreen extends StatelessWidget {
-  const UsersTableScreen({Key? key}) : super(key: key);
+  const UsersTableScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

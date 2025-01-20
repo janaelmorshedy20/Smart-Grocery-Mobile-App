@@ -336,7 +336,7 @@ import 'package:smartgrocery/editprofile.dart';
 import 'package:smartgrocery/voucherscodes.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  const UserProfileScreen({Key? key}) : super(key: key);
+  const UserProfileScreen({super.key});
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -422,7 +422,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     child: CircleAvatar(
                   radius: 50.0, // Adjust the size as needed
                   backgroundColor: Colors.grey[300],
-                  child: Icon(
+                  child: const Icon(
                     Icons.person,
                     size: 50.0, // Icon size
                     color: Colors.white,
@@ -489,7 +489,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditProfileScreen(),
+                      builder: (context) => const EditProfileScreen(),
                     ),
                   );
                 }),
@@ -499,7 +499,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => VouchersPage(),
+                      builder: (context) => const VouchersPage(),
                     ),
                   );
                 }),

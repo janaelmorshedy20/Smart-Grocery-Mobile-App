@@ -67,7 +67,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     final ImagePicker picker = ImagePicker();
     // Pick an image.
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) file = File(image!.path);
+    if (image != null) file = File(image.path);
     setState(() {});
   }
 
@@ -133,8 +133,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return "Please enter the category name";
+                  return null;
+                  }
                 },
               ),
               const SizedBox(height: 30),

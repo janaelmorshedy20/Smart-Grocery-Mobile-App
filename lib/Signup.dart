@@ -9,7 +9,7 @@ import 'dart:convert'; // for utf8.encode()
 import 'HomePage.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -23,7 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _phonenumberController = TextEditingController();
 
   bool _obscurePassword = true;
-  String _errorMessage = ''; // This will store the error message
+  final String _errorMessage = ''; // This will store the error message
 
   String hashPassword(String password) {
     final bytes = utf8.encode(password); // Convert password to bytes
@@ -63,7 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (e.code == 'email-already-in-use') {
         // Show an error message
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('The email address is already used.'),
             backgroundColor: Colors.red,
           ),

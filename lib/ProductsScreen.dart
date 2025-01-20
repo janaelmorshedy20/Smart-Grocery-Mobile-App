@@ -7,7 +7,7 @@ import 'models/Product.dart';
 class ProductsScreen extends StatelessWidget {
   final String categoryId;
 
-  const ProductsScreen({Key? key, required this.categoryId}) : super(key: key);
+  const ProductsScreen({super.key, required this.categoryId});
   // const ProductsScreen({super.key, required this.categoryId});
 
   Stream<List<Product>> getItemsFromFirestore() {

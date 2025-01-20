@@ -284,8 +284,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return "Please enter the product name";
+                  return null;
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -298,10 +300,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return "Please enter the product price";
-                  if (double.parse(value) <= 0)
+                  }
+                  if (double.parse(value) <= 0) {
                     return "Please enter a valid price";
+                  return null;
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -356,10 +361,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     border: OutlineInputBorder()),
                 // decoration: const InputDecoration(suffixText: 'Liter', labelText: "Weight", border: OutlineInputBorder()),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return "Please enter the product Weight";
-                  if (double.parse(value) <= 0)
+                  }
+                  if (double.parse(value) <= 0) {
                     return "Please enter a valid Weight";
+                  return null;
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -369,10 +377,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 decoration: const InputDecoration(
                     labelText: "Quantity", border: OutlineInputBorder()),
                 validator: (value) {
-                  if (value == null || value.isEmpty)
+                  if (value == null || value.isEmpty) {
                     return "Please enter the product quantity";
-                  if (int.parse(value) <= 0)
+                  }
+                  if (int.parse(value) <= 0) {
                     return "Please enter a valid quantity";
+                  return null;
+                  }
                 },
               ),
               const SizedBox(height: 20),

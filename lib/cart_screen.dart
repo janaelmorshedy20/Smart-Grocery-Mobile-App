@@ -238,13 +238,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/models/Product.dart';
 import 'package:smartgrocery/models/Cart.dart';
 import 'package:smartgrocery/provider/cartprovider.dart'; // Import the Cart model
+import 'checkout_screen.dart';
+
 
 // Define providers to manage the voucher code and discount
 final voucherCodeProvider = StateProvider<String>((ref) => '');
 final discountProvider = StateProvider<double>((ref) => 0.0);
 
 class CartScreen extends ConsumerWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -276,7 +278,7 @@ class CartScreen extends ConsumerWidget {
                   // Display cart items
                   ...cartItems
                       .map((item) => _buildCartItem(item, ref))
-                      .toList(),
+                      ,
                   const SizedBox(height: 20),
 
                   // Add Coupon Section
@@ -399,8 +401,16 @@ class CartScreen extends ConsumerWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () {
-                      // Commented out the lines for adding to the database
-                      // _checkout(context, cartItems, finalPrice);
+                      // Navigate to CheckoutScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutScreen(
+                            cartItems: cartItems,
+                            finalPrice: finalPrice,
+                          ),
+                        ),
+                      );
                     },
                     child: const Text('Checkout'),
                   ),

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smartgrocery/models/vouchers.dart'; // Import Voucher model
 
 class ActionPage extends StatefulWidget {
-  const ActionPage({Key? key}) : super(key: key);
+  const ActionPage({super.key});
 
   @override
   State<ActionPage> createState() => _ActionPageState();

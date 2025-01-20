@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ProductsPage extends StatelessWidget {
-  const ProductsPage({Key? key}) : super(key: key);
+  const ProductsPage({super.key});
 
   Stream<List<Map<String, dynamic>>> getProductsFromFirestore() {
     return FirebaseFirestore.instance
@@ -168,7 +168,7 @@ class ProductsPage extends StatelessWidget {
 class EditProductScreen extends StatelessWidget {
   final Map<String, dynamic> product;
 
-  const EditProductScreen({Key? key, required this.product}) : super(key: key);
+  const EditProductScreen({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
