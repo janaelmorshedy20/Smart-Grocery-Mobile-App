@@ -25,6 +25,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
   String _customerName = '';
   String _phoneNumber = '';
   bool _isLoading = true;
+  String _paymentMethod = 'Cash on Delivery'; // Default payment method
 
   @override
   void initState() {
@@ -130,6 +131,46 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                       ),
                       const SizedBox(height: 20),
 
+                      // Payment Method Selection
+                      const Text(
+                        'Payment Method',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title: const Text('Cash on Delivery'),
+                              leading: Radio<String>(
+                                value: 'Cash on Delivery',
+                                groupValue: _paymentMethod,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    _paymentMethod = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title: const Text('Credit Card'),
+                              leading: Radio<String>(
+                                value: 'Credit Card',
+                                groupValue: _paymentMethod,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    _paymentMethod = value!;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
                       // Place Order Button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -158,6 +199,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           name: item.product.name,
           price: item.product.price,
           totalprice: item.product.price * item.quantity, // Multiply by quantity
+          quantity: item.quantity,  // Added quantity
         );
       }).toList();
 
@@ -171,6 +213,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
         customerName: _customerName,
         shippingAddress: _shippingAddressController.text,
         phoneNumber: _phoneNumber,
+        paymentMethod: _paymentMethod, // Include payment method in the order
       );
 
       // Save order to Firestore

@@ -7,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'HomePage.dart';
 import 'ocr.dart';
 import 'addProduct.dart';
-// import 'addproducts.dart';
 import 'signup.dart';
 import 'Login.dart';
 import 'welcomeScreen.dart';
@@ -24,9 +23,9 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-      url: "https://gralztxksbzwiprnipoj.supabase.co",
-      anonKey:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyYWx6dHhrc2J6d2lwcm5pcG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczMzkxMjcsImV4cCI6MjA1MjkxNTEyN30.UTTiCnNEtezAz2iZ5lkaufbETnzcB1quVShfMf-29fM");
+    url: "https://gralztxksbzwiprnipoj.supabase.co",
+    anonKey: "your-supabase-anon-key", // Replace with your Supabase anon key
+  );
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -56,9 +55,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
+      theme: ThemeData.light().copyWith(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
+      darkTheme: ThemeData.dark().copyWith(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      ),
+      themeMode: ThemeMode.system, // Automatically uses the system's theme mode (light/dark)
       initialRoute: isLoggedIn
           ? (isAdmin ? '/admindashboard' : '/HomePage') // Admin gets admin dashboard
           : '/login2', // Use '/HomePage' if user is logged in
