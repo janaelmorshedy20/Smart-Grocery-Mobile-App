@@ -3,9 +3,11 @@ import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/userprofile.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'HomePage.dart';
 import 'ocr.dart';
-import 'addproducts.dart';
+import 'addProduct.dart';
+// import 'addproducts.dart';
 import 'signup.dart';
 import 'Login.dart';
 import 'welcomeScreen.dart';
@@ -19,6 +21,12 @@ import 'package:shared_preferences/shared_preferences.dart'; // For SharedPrefer
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures proper widget binding for async operations
   await Firebase.initializeApp(); // Initialize Firebase
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+      url: "https://gralztxksbzwiprnipoj.supabase.co",
+      anonKey:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyYWx6dHhrc2J6d2lwcm5pcG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczMzkxMjcsImV4cCI6MjA1MjkxNTEyN30.UTTiCnNEtezAz2iZ5lkaufbETnzcB1quVShfMf-29fM");
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

@@ -5,6 +5,7 @@ import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/models/Product.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
 
+import 'addProduct.dart';
 import 'products.dart';
 import 'addproducts.dart';
 import 'package:firebase_auth/firebase_auth.dart';

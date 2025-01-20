@@ -20,7 +20,7 @@ class Product {
   final double newPrice;
   final bool isAllergenic;
   final Timestamp createdAt;
-  //final String? imageUrl;
+  final String imageUrl;
 
   Product({
     // String? id, // Optional; generates a new UUID if not provided
@@ -37,7 +37,7 @@ class Product {
     required this.newPrice,
     required this.isAllergenic,
     required this.createdAt,
-    //this.imageUrl,
+    required this.imageUrl,
   });
   // : id = id ?? uuid.v4(); // Automatically generates a UUID if id is null
 
@@ -57,7 +57,7 @@ class Product {
       'newPrice': newPrice,
       'isAllergenic': isAllergenic,
       'createdAt': createdAt,
-      // 'imageUrl': imageUrl,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -83,7 +83,7 @@ class Product {
       newPrice: (data['newPrice'] ?? 0.0).toDouble(),
       isAllergenic: data['isAllergenic'] ?? false,
       createdAt: data['createdAt'] ?? Timestamp.now(),
-      // imageUrl: data['imageUrl'],
+      imageUrl: data['imageUrl'],
     );
   }
 }

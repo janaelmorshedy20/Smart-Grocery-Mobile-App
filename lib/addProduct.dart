@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'models/Product.dart';
@@ -22,7 +23,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _newPriceController = TextEditingController();
-  final TextEditingController _productionDateController = TextEditingController();
+  final TextEditingController _productionDateController =
+      TextEditingController();
   final TextEditingController _expireDateController = TextEditingController();
   Category? _selectedCategory;
 
@@ -100,14 +102,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
     //   return;
     // }
 //---------------------------------------------------------
+
     if (!formState.currentState!.validate()) {
       return;
     }
-
     setState(() {
       _isLoading = true;
     });
 
+    // Step 1: Upload image to Supabase
+    String fileName = _nameController.text;
+    String imageUrl = await uploadImageToSupabase(fileName);
+
+   if (imageUrl == null || imageUrl == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter product image")),
+      );
+      return;
+    }
     try {
       final product = Product(
         id: uuid.v4(),
@@ -126,16 +138,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
             _isOnSale ? double.tryParse(_newPriceController.text) ?? 0.0 : 0.0,
         isAllergenic: _isAllergyCausing,
         createdAt: Timestamp.now(),
+        imageUrl: imageUrl,
       );
 
       // Add product data to Firestore
-      await FirebaseFirestore.instance
-          .collection('products')
-          .add(product.toMap());
+      // Step 2: Save product to Firestore
+      if (imageUrl.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection('products')
+            .add(product.toMap());
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product added successfully!')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product added successfully!')),
+        );
+      }
 
       formState.currentState!.reset();
       setState(() {
@@ -151,6 +167,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         // _expireDate = null;
         _isOnSale = false;
         _isAllergyCausing = false;
+        file = null;
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -163,13 +180,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
+  Future<String> uploadImageToSupabase(String fileName) async {
+    if (file == null) {
+      print("couldn't upload the image to supabase");
+      return '';
+    }
+    try {
+      // final file = File(filePath);
+      final path = '/products/$fileName';
+      await Supabase.instance.client.storage
+          .from('images') // 'images' is your Supabase storage bucket name
+          // ignore: avoid_print
+          .upload(path, file!)
+          .then((value) => print("Image upload successful"));
+
+      final imageUrl = Supabase.instance.client.storage
+          .from('images')
+          .getPublicUrl(fileName);
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
   File? file;
 
   getImage() async {
     final ImagePicker picker = ImagePicker();
     // Pick an image.
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) file = File(image!.path);
+    if (image != null) file = File(image.path);
     setState(() {});
   }
 
@@ -215,10 +256,19 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     child: file != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(16), // To match the container's border radius
-                            child: Image.file(file!, width: 120, height: 120, fit: BoxFit.cover,),
+                            borderRadius: BorderRadius.circular(
+                                16), // To match the container's border radius
+                            child: Image.file(
+                              file!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            ),
                           )
-                        : const Icon(Icons.photo_camera, color: Colors.grey,),
+                        : const Icon(
+                            Icons.photo_camera,
+                            color: Colors.grey,
+                          ),
                   ),
                 ),
                 onTap: () async {
