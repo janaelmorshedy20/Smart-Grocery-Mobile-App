@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/models/Cart.dart';
 import 'package:smartgrocery/provider/cartprovider.dart';
+import 'placeOrder_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
   final List<CartItem> cartItems;
@@ -31,9 +32,7 @@ class CheckoutScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Display cart items
-                  ...cartItems
-                      .map((item) => _buildCartItem(item))
-                      .toList(),
+                  ...cartItems.map((item) => _buildCartItem(item)).toList(),
 
                   const SizedBox(height: 20),
 
@@ -57,58 +56,23 @@ class CheckoutScreen extends StatelessWidget {
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () {
-                      _checkout(context, cartItems, finalPrice);
+                      // Navigate to the PlaceOrderScreen and pass cartItems and finalPrice
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlaceOrderScreen(
+                            cartItems: cartItems,
+                            finalPrice: finalPrice,
+                          ),
+                        ),
+                      );
                     },
-                    child: const Text('Place Order'),
+                    child: const Text('Proceed to Place Order'),
                   ),
                 ],
               ),
             ),
     );
-  }
-
-  // Function to handle placing the order
-  Future<void> _checkout(
-      BuildContext context, List<CartItem> cartItems, double totalPrice) async {
-    try {
-      // Create the order object
-      final orderData = {
-        'items': cartItems.map((item) {
-          return {
-            'productId': item.product.id,
-            'quantity': item.quantity,
-            'price': item.product.price,
-          };
-        }).toList(),
-        'totalPrice': totalPrice,
-        'status': 'Pending',
-        'orderDate': Timestamp.now(),
-      };
-
-      // Add the order to Firestore
-      final orderRef = await FirebaseFirestore.instance.collection('orders').add(orderData);
-
-      // Clear the cart after successful checkout
-      await FirebaseFirestore.instance.collection('carts').doc(orderRef.id).delete();
-
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Order placed successfully!'),
-        ),
-      );
-
-      // Navigate back to the home page (or another page after successful order)
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-
-    } catch (e) {
-      print('Error placing order: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error placing the order. Please try again!'),
-        ),
-      );
-    }
   }
 
   // Build Cart Item widget (similar to CartScreen)
@@ -149,12 +113,6 @@ class CheckoutScreen extends StatelessWidget {
           Text('${item.product.price} EGP x ${item.quantity}',
               style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 10),
-          IconButton(
-            onPressed: () {
-              // Add functionality for item removal (assuming you have a CartProvider)
-            },
-            icon: const Icon(Icons.delete, color: Colors.red),
-          ),
         ],
       ),
     );
