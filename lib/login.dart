@@ -29,7 +29,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
       // Admin login - Store admin session
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isAdmin', true); // Save admin session
-      await prefs.setString('uid', adminID); // Store static admin ID
+      await prefs.setString('uid', FirebaseAuth.instance.currentUser!.uid); // Store static admin ID
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

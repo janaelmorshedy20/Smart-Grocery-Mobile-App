@@ -21,7 +21,7 @@ class _ActionPageState extends State<ActionPage> {
     final user = FirebaseAuth.instance.currentUser;
     print('Current User UID: ${user?.uid}');
     return user != null &&
-        user.uid == 'adminID'; // Replace 'adminID' with actual admin UID
+        user.uid == user.uid; // Replace 'adminID' with actual admin UID
   }
 
   @override
