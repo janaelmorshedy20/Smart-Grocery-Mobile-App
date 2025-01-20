@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smartgrocery/ProductsScreen.dart';
+import 'package:smartgrocery/CategoryScreen.dart';
 import 'package:smartgrocery/signup.dart';
 import 'package:smartgrocery/admindashboard.dart';
-
-import 'CategoryScreen.dart';
 
 class LoginScreen2 extends StatefulWidget {
   const LoginScreen2({Key? key}) : super(key: key);
@@ -21,11 +19,17 @@ class _LoginScreenV2State extends State<LoginScreen2> {
   final _passwordController = TextEditingController();
   final String adminEmail = "admin@gmail.com";
   final String adminPassword = "admin123";
+  final String adminID = "adminID"; // Static Admin ID
 
   Future login() async {
     // Check if the provided email and password match the admin credentials
-    if (_emailController.text.trim() == adminEmail && _passwordController.text.trim() == adminPassword) {
-      // If match, navigate to the admin dashboard
+    if (_emailController.text.trim() == adminEmail &&
+        _passwordController.text.trim() == adminPassword) {
+      // Admin login - Navigate to Admin Dashboard
+      // Admin login - Store admin session
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isAdmin', true); // Save admin session
+      await prefs.setString('uid', adminID); // Store static admin ID
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -33,7 +37,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
         ),
       );
     } else {
-      // Try to sign in with Firebase Authentication if not admin
+      // Firebase authentication for regular users
       try {
         print('Starting Firebase operation');
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -42,28 +46,17 @@ class _LoginScreenV2State extends State<LoginScreen2> {
         );
         print('Firebase operation complete');
 
-        // Store user session using SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('uid', FirebaseAuth.instance.currentUser!.uid);
 
-        // Check session after login
-        bool? isLoggedIn = prefs.getBool('isLoggedIn');
-        String? uid = prefs.getString('uid');
-        print('isLoggedIn: $isLoggedIn');
-        print('User UID: $uid');
-
-
-        // Navigate to the HomePage if login is successful
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const CategoryScreen()), // Navigate to HomePage
+          MaterialPageRoute(builder: (context) => const CategoryScreen()),
         );
       } on FirebaseAuthException catch (e) {
-        // Handle login errors (e.g., invalid email or password)
         print('Error during Firebase operation: $e');
         if (e.code == 'wrong-password') {
-          // Show a custom SnackBar for wrong password
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Incorrect password! Please try again.'),
@@ -71,7 +64,6 @@ class _LoginScreenV2State extends State<LoginScreen2> {
             ),
           );
         } else {
-          // Default error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${e.message}'),
@@ -103,18 +95,14 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                 const SizedBox(height: 20),
                 const Text(
                   'Welcome to our',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const Text(
                   'E-Grocery',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green),
                 ),
                 const SizedBox(height: 40),
                 TextFormField(
@@ -122,8 +110,7 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                   decoration: InputDecoration(
                     labelText: 'Email',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -139,14 +126,11 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                   decoration: InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
+                      icon: Icon(_obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility),
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
@@ -166,40 +150,34 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                   onTap: () async {
                     if (_emailController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please enter your email address.'),
-                          backgroundColor: Colors.red,
-                        ),
+                        const SnackBar(
+                            content: Text('Please enter your email address.'),
+                            backgroundColor: Colors.red),
                       );
                       return;
                     }
-
                     try {
-                      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+                      await FirebaseAuth.instance
+                          .sendPasswordResetEmail(email: _emailController.text);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Password reset email sent successfully!'),
-                          backgroundColor: Colors.green,
-                        ),
+                        const SnackBar(
+                            content:
+                                Text('Password reset email sent successfully!'),
+                            backgroundColor: Colors.green),
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Error: ${e.toString()}'),
-                          backgroundColor: Colors.red,
-                        ),
+                            content: Text('Error: ${e.toString()}'),
+                            backgroundColor: Colors.red),
                       );
                     }
                   },
                   child: const Align(
                     alignment: Alignment.centerRight,
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: Text('Forgot Password?',
+                        style: TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -213,17 +191,12 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10)),
                     alignment: Alignment.center,
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: const Text('Login',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -236,19 +209,14 @@ class _LoginScreenV2State extends State<LoginScreen2> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignUpScreen(),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen()));
                       },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: const Text('Sign Up',
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),

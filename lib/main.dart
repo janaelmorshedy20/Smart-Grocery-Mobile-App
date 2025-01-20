@@ -17,18 +17,22 @@ import 'admindashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();// Ensures proper widget binding for async operations
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures proper widget binding for async operations
   await Firebase.initializeApp(); // Initialize Firebase
-  
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  
+  bool isAdmin = prefs.getBool('isAdmin') ?? false; // Get isAdmin flag
+
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,DeviceOrientation.portraitDown,DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft, 
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
   ]).then((fn) {
     runApp(
       ProviderScope(
-        child: MyApp(isLoggedIn: isLoggedIn),
+        child: MyApp(isLoggedIn: isLoggedIn, isAdmin: isAdmin),
       ),
     );
   });
@@ -36,8 +40,9 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
+  final bool isAdmin;
 
-  const MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
+  const MyApp({Key? key, required this.isLoggedIn, required this.isAdmin}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +51,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      initialRoute: isLoggedIn ? '/categories' : '/login2', // Use '/HomePage' if user is logged in
+      initialRoute: isLoggedIn
+          ? (isAdmin ? '/admindashboard' : '/categories') // Admin gets admin dashboard
+          : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login2': (context) => const LoginScreen2(),
@@ -60,7 +67,6 @@ class MyApp extends StatelessWidget {
         '/adminProducts': (context) => const ProductsPage(),
         '/ocr': (context) => ShoppingListScreen(),
         '/userprofile': (context) => const UserProfileScreen(),
-         
       },
     );
   }

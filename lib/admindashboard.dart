@@ -1,28 +1,58 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartgrocery/Login.dart';
+import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
 
-import 'addCategory.dart';
 import 'addProduct.dart';
 import 'products.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminDashboard extends StatelessWidget {
+  // Fetch the user count from Firestore
+  Future<int> getUserCount() async {
+    try {
+      // Fetch users collection and count the documents
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching user count: $e');
+      return 0; // Return 0 if there is an error
+    }
+  }
 
-//   Future<int> getProductCount() async {
-//   try {
-//     // Fetch the documents in the 'products' collection
-//     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('products').get();
-//     return snapshot.docs.length;
-//   } catch (e) {
-//     print('Error fetching product count: $e');
-//     return 0; // Return 0 in case of an error
-//   }
-// }
+  Future<void> logout(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Clear the session if necessary
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                const LoginScreen2()), // Navigate to login screen after logout
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error logging out: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
         backgroundColor: Colors.green,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () => logout(context),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -33,14 +63,6 @@ class AdminDashboard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildHeaderItem(
-                  context,
-                  title: 'Dashboard',
-                  onTap: () {
-                    // Navigate to Dashboard or home page
-                    print('Dashboard clicked');
-                  },
-                ),
                 _buildHeaderItem(
                   context,
                   title: 'Categories',
@@ -89,9 +111,7 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Categories',
                     value: '3',
                     onTap: () {
-                     Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const AddCategoryScreen(),),
-                    );
+                      // Handle Categories card tap
                     },
                   ),
                   _buildDashboardCard(
@@ -99,19 +119,58 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Products',
                     value: '9',
                     onTap: () {
-                      Navigator.push(context,MaterialPageRoute(builder: (context) => const AddProductScreen()),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddProductScreen()),
                       );
                     },
                   ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Users',
-                    value: '55',
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const UsersPage()),
-                      // );
+                  // FutureBuilder to load user count
+                  FutureBuilder<int>(
+                    future: getUserCount(), // Fetch the actual user count
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Users',
+                          value:
+                              'Loading...', // Show loading text until data is fetched
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UsersTableScreen()),
+                            );
+                          },
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Users',
+                          value: 'Error',
+                          onTap: () {
+                            // Handle error (e.g., navigate to an error page)
+                          },
+                        );
+                      }
+
+                      final userCount = snapshot.data ?? 0;
+                      return _buildDashboardCard(
+                        context,
+                        title: 'Users',
+                        value: '$userCount',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const UsersTableScreen()),
+                          );
+                        },
+                      );
                     },
                   ),
                   _buildDashboardCard(
@@ -119,10 +178,7 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Orders',
                     value: '2',
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const OrdersPage()),
-                      // );
+                      // Handle Orders card tap
                     },
                   ),
                   _buildDashboardCard(
@@ -130,10 +186,7 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Active Users',
                     value: '34',
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const ActiveUsersPage()),
-                      // );
+                      // Handle Active Users card tap
                     },
                   ),
                 ],
@@ -144,6 +197,7 @@ class AdminDashboard extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildHeaderItem(
     BuildContext context, {
     required String title,
