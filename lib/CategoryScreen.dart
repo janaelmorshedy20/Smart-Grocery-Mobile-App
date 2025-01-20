@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smartgrocery/userprofile.dart';
 import 'models/Category.dart';
 import 'HomePage.dart';
 import 'favoritelist.dart';
@@ -148,6 +149,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+        );
+        break;
+              case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UserProfileScreen()),
         );
         break;
       default:

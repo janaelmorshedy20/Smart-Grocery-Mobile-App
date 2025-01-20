@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:smartgrocery/actionpage.dart';
 
 class UsersTableScreen extends StatelessWidget {
   const UsersTableScreen({Key? key}) : super(key: key);
@@ -39,34 +38,8 @@ class UsersTableScreen extends StatelessWidget {
               rows: users.map((user) {
                 final data = user.data() as Map<String, dynamic>;
                 return DataRow(cells: [
-                  DataCell(
-                    GestureDetector(
-                      onTap: () {
-                        // Redirect to ActionPage when clicking on a row
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActionPage(userId: user.id),
-                          ),
-                        );
-                      },
-                      child: Text(data['name'] ?? 'N/A'),
-                    ),
-                  ),
-                  DataCell(
-                    GestureDetector(
-                      onTap: () {
-                        // Redirect to ActionPage when clicking on a row
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActionPage(userId: user.id),
-                          ),
-                        );
-                      },
-                      child: Text(data['email'] ?? 'N/A'),
-                    ),
-                  ),
+                  DataCell(Text(data['name'] ?? 'N/A')),
+                  DataCell(Text(data['email'] ?? 'N/A')),
                 ]);
               }).toList(),
             ),

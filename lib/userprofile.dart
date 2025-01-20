@@ -194,7 +194,6 @@
 //   }
 // }
 
-
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -293,10 +292,7 @@
 //     );
 //   }
 
-
 // }
-
-
 
 // class PastOrdersScreen extends StatelessWidget {
 //   const PastOrdersScreen({Key? key}) : super(key: key);
@@ -332,13 +328,12 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/editprofile.dart';
+import 'package:smartgrocery/voucherscodes.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({Key? key}) : super(key: key);
@@ -419,56 +414,52 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),
-                
               ),
             ),
-            
             child: Column(
               children: [
-               
-            Center(
-              child: CircleAvatar(
-                radius: 50.0, // Adjust the size as needed
-                backgroundColor: Colors.grey[300],
-                child: Icon(
-                  Icons.person,
-                  size: 50.0, // Icon size
-                  color: Colors.white,
-                ),
-              )
-            ),
+                Center(
+                    child: CircleAvatar(
+                  radius: 50.0, // Adjust the size as needed
+                  backgroundColor: Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    size: 50.0, // Icon size
+                    color: Colors.white,
+                  ),
+                )),
                 const SizedBox(height: 10),
                 _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Name: ${_nameController.text}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Name: ${_nameController.text}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Email: ${_emailController.text}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Phone: ${_phonenumberController.text}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Email: ${_emailController.text}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                       const SizedBox(height: 10),
-                      Text(
-                        'Phone: ${_phonenumberController.text}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
               ],
             ),
           ),
@@ -496,17 +487,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               children: [
                 _buildListTile(Icons.person, 'Edit Profile', () {
                   Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EditProfileScreen(), // Replace with your actual screen widget
-          ),
-        );
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfileScreen(),
+                    ),
+                  );
                 }),
                 _buildListTile(Icons.settings, 'Setting', () {}),
                 _buildListTile(Icons.payment, 'Payment', () {}),
+                _buildListTile(Icons.card_giftcard, 'Vouchers', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VouchersPage(),
+                    ),
+                  );
+                }),
                 _buildListTile(Icons.logout, 'Logout', () {
-                   _logout(context);
-                
+                  _logout(context);
                 }),
               ],
             ),
@@ -515,7 +513,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
     );
   }
-    void _logout(BuildContext context) async {
+
+  void _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     await FirebaseAuth.instance.signOut();

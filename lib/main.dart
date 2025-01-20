@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       initialRoute: isLoggedIn
-          ? (isAdmin ? '/admindashboard' : '/userprofile') // Admin gets admin dashboard
+          ? (isAdmin ? '/admindashboard' : '/categories') // Admin gets admin dashboard
           : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),

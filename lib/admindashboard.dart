@@ -1,13 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smartgrocery/actionpage.dart'; // Import ActionPage
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/Login.dart';
-import 'package:smartgrocery/models/Product.dart';
+import 'package:smartgrocery/products.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
-
 import 'addProduct.dart';
-import 'products.dart';
-import 'addproducts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminDashboard extends StatelessWidget {
@@ -123,8 +121,7 @@ class AdminDashboard extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => ProductsPage()),
+                        MaterialPageRoute(builder: (context) => ProductsPage()),
                       );
                     },
                   ),
@@ -185,10 +182,16 @@ class AdminDashboard extends StatelessWidget {
                   ),
                   _buildDashboardCard(
                     context,
-                    title: 'Active Users',
+                    title: 'Add vouchers',
                     value: '34',
                     onTap: () {
-                      // Handle Active Users card tap
+                      // Navigate to ActionPage for adding vouchers
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ActionPage(),
+                        ),
+                      );
                     },
                   ),
                 ],
