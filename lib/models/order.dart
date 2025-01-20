@@ -10,6 +10,7 @@ class Order {
   final String customerName;
   final String shippingAddress;
   final String phoneNumber;
+  final String paymentMethod;  // New field added
 
   Order({
     required this.id,
@@ -20,6 +21,7 @@ class Order {
     required this.customerName,
     required this.shippingAddress,
     required this.phoneNumber,
+    required this.paymentMethod,  // Added paymentMethod to constructor
   });
 
   // Convert Firestore document to Order object
@@ -35,6 +37,7 @@ class Order {
       customerName: data['customerName'] ?? '',
       shippingAddress: data['shippingAddress'] ?? '',
       phoneNumber: data['phoneNumber'] ?? '',
+      paymentMethod: data['paymentMethod'] ?? 'Cash on Delivery',  // Default to 'Cash on Delivery' if missing
     );
   }
 
@@ -49,6 +52,7 @@ class Order {
       'customerName': customerName,
       'shippingAddress': shippingAddress,
       'phoneNumber': phoneNumber,
+      'paymentMethod': paymentMethod,  // Include paymentMethod in the map
     };
   }
 }
