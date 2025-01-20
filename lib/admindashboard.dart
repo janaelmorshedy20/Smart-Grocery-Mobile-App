@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/Login.dart';
 import 'package:smartgrocery/products.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
+import 'package:smartgrocery/vouchersActions.dart';
 import 'addProduct.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -190,6 +191,20 @@ class AdminDashboard extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const ActionPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDashboardCard(
+                    context,
+                    title: 'Vouchers',
+                    value: '3',
+                    onTap: () {
+                      // Navigate to ActionPage for adding vouchers
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const VoucherActionScreen(),
                         ),
                       );
                     },
