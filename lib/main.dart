@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For orientation control
 import 'package:firebase_core/firebase_core.dart'; // For Firebase
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smartgrocery/editprofile.dart';
 import 'package:smartgrocery/userprofile.dart';
 import 'HomePage.dart';
 import 'ocr.dart';

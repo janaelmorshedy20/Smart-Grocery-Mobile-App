@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'models/Product.dart';
 import 'models/Category.dart';
 import 'HomePage.dart';
 import 'favoritelist.dart';
