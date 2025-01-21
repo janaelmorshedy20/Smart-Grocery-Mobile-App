@@ -21,6 +21,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   bool isFavorite = false;
   int quantity = 1;
 
+  // Simulate user's allergenic status (Replace with actual user data source)
+  bool isUserAllergenic = true; // This should be fetched from user profile or Firestore
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,43 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       }
     } catch (e) {
       throw Exception("Error fetching product details: $e");
+    }
+  }
+
+  // Function to display the allergenic warning
+  void _showAllergenicWarning(Product product) {
+    if (isUserAllergenic && product.isAllergenic) {
+      // Show a dialog asking if the user wants to continue
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Allergy Warning'),
+          content: Text(
+              'This product contains allergens. Are you sure you want to add it to the cart?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                ref.read(cartProvider.notifier).addProduct(product, quantity);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('${product.name} added to cart!')));
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Proceed to add product directly to the cart if no allergy warning
+      ref.read(cartProvider.notifier).addProduct(product, quantity);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('${product.name} added to cart!')));
     }
   }
 
@@ -119,7 +159,6 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Display Product Image using product.imageUrl
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -184,17 +223,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                       backgroundColor: Colors.green,
                       minimumSize: const Size(double.infinity, 50)),
                   onPressed: () {
-                    if (quantity <= product.quantity) {
-                      ref
-                          .read(cartProvider.notifier)
-                          .addProduct(product, quantity);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('${product.name} added to cart!')));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Not enough stock available'),
-                          backgroundColor: Colors.red));
-                    }
+                    _showAllergenicWarning(product);
                   },
                   child: const Text('Add To Cart',
                       style: TextStyle(color: Colors.white)),
