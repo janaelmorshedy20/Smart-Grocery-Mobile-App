@@ -17,44 +17,58 @@ class _ActionPageState extends State<ActionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Voucher'),
+        title: const Text('Add Voucher',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
         centerTitle: true,
+        backgroundColor: Colors.green,
+        elevation: 3,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title
             const Text(
               'Enter Voucher Details:',
-              style: TextStyle(fontSize: 25),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // TextField for entering voucher code
-            TextField(
+            // Voucher Code Field
+            _buildInputField(
               controller: voucherCodeController,
-              decoration: const InputDecoration(
-                labelText: 'Enter Voucher Code',
-                border: OutlineInputBorder(),
-              ),
+              labelText: 'Enter Voucher Code',
+              icon: Icons.confirmation_number,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
-            // TextField for entering discount
-            TextField(
+            // Discount Field
+            _buildInputField(
               controller: discountController,
-              decoration: const InputDecoration(
-                labelText: 'Discount',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
+              labelText: 'Discount Amount',
+              icon: Icons.percent,
+              isNumeric: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
-            ElevatedButton(
-              onPressed: _addVoucherToAllUsers,
-              child: const Text('Add Voucher'),
+            // Add Voucher Button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _addVoucherToAllUsers,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Add Voucher',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         ),
@@ -62,17 +76,45 @@ class _ActionPageState extends State<ActionPage> {
     );
   }
 
+  // UI Helper for Input Fields
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData icon,
+    bool isNumeric = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          labelText: labelText,
+          prefixIcon: Icon(icon, color: Colors.green),
+          border: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  // Function to Add Voucher to Firestore
   void _addVoucherToAllUsers() async {
     final voucherCode = voucherCodeController.text.trim();
     final discount = double.tryParse(discountController.text.trim());
 
     if (voucherCode.isEmpty || discount == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all fields correctly'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackbar('Please fill all fields correctly', Colors.red);
       return;
     }
 
@@ -83,30 +125,28 @@ class _ActionPageState extends State<ActionPage> {
         discount: discount,
       );
 
-      // Add the voucher to the 'vouchers' collection (not specific to any user)
-      final voucherRef = FirebaseFirestore.instance
-          .collection('vouchers')
-          .doc(); // Auto-generate document ID
-
+      // Add the voucher to Firestore
+      final voucherRef = FirebaseFirestore.instance.collection('vouchers').doc();
       await voucherRef.set(voucher.toMap());
 
-      // Clear the text fields after successful voucher addition
+      // Clear input fields after success
       voucherCodeController.clear();
       discountController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Voucher added successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      _showSnackbar('Voucher added successfully!', Colors.green);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackbar('Error: ${e.toString()}', Colors.red);
     }
+  }
+
+  // Snackbar Helper Function
+  void _showSnackbar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }
