@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -12,51 +11,37 @@ class ProductsPage extends StatelessWidget {
         .map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
   }
 
-  // void deleteProduct(String productId) async {
-  //   try {
-  //     await FirebaseFirestore.instance.collection('products').doc(productId).delete();
-  //     print('Product deleted: $productId');
-  //   } catch (e) {
-  //     print('Error deleting product: $e');
-  //   }
-  // }
-
-
   void deleteProduct(BuildContext context, Map<String, dynamic> product) async {
-  final productId = product['id'];
+    final productId = product['id'];
 
-  // Temporarily delete the product from Firestore
-  try {
-    await FirebaseFirestore.instance.collection('products').doc(productId).delete();
+    // Temporarily delete the product from Firestore
+    try {
+      await FirebaseFirestore.instance.collection('products').doc(productId).delete();
 
-    // Show a snackbar with undo action
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product['name']} deleted'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () async {
-            // Restore the product to Firestore
-            await FirebaseFirestore.instance.collection('products').doc(productId).set(product);
-            print('Undo: ${product['name']} restored');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Undo: ${product['name']} restored')),
-            );
-          },
+      // Show a snackbar with undo action
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${product['name']} deleted'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () async {
+              // Restore the product to Firestore
+              await FirebaseFirestore.instance.collection('products').doc(productId).set(product);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Undo: ${product['name']} restored')),
+              );
+            },
+          ),
+          duration: const Duration(seconds: 4), // Duration before snackbar disappears
         ),
-        duration: const Duration(seconds: 4), // Duration before snackbar disappears
-      ),
-    );
-
-    print('Product deleted: $productId');
-  } catch (e) {
-    print('Error deleting product: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error deleting ${product['name']}')),
-    );
+      );
+    } catch (e) {
+      print('Error deleting product: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting ${product['name']}')),
+      );
+    }
   }
-}
-
 
   void editProduct(BuildContext context, Map<String, dynamic> product) {
     Navigator.push(
@@ -74,40 +59,47 @@ class ProductsPage extends StatelessWidget {
         title: const Text('Products'),
         backgroundColor: Colors.green,
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: getProductsFromFirestore(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          // Product grid
+          Expanded(
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: getProductsFromFirestore(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No products available'));
-          }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No products available'));
+                }
 
-          final products = snapshot.data!;
+                final products = snapshot.data!;
 
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return _buildProductCard(
-                  context,
-                  product: product,
-                  onDelete: () => deleteProduct(context, product),
-                  onEdit: () => editProduct(context, product),
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final product = products[index];
+                      return _buildProductCard(
+                        context,
+                        product: product,
+                        onDelete: () => deleteProduct(context, product),
+                        onEdit: () => editProduct(context, product),
+                      );
+                    },
+                  ),
                 );
               },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

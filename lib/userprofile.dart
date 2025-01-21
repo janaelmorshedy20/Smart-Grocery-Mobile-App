@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartgrocery/CategoryScreen.dart';
+import 'package:smartgrocery/HomePage.dart';
 import 'package:smartgrocery/editprofile.dart';
+import 'package:smartgrocery/favoritelist.dart';
 import 'package:smartgrocery/vieworders.dart';
 import 'package:smartgrocery/voucherscodes.dart';
 
@@ -21,6 +24,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   bool _isLoading = false;
   late String userId;
   String? _allergyStatus; // Tracks the selected option: "Yes" or "No"
+  int _selected = 3; // Set default selected index to Profile (index 3)
 
   @override
   void initState() {
@@ -105,7 +109,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile' , style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -177,7 +181,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           const SizedBox(height: 16),
 
-
           // Vertical Menu
           Expanded(
             child: ListView(
@@ -191,15 +194,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   );
                 }),
-                _buildListTile(Icons.shopping_cart, 'All Orders',(){
-                   Navigator.push(
+                _buildListTile(Icons.shopping_cart, 'All Orders', () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>  ViewOrderPage(),
+                      builder: (context) => ViewOrderPage(),
                     ),
-                   );
+                  );
                 }),
-               
                 _buildListTile(Icons.card_giftcard, 'Vouchers', () {
                   Navigator.push(
                     context,
@@ -210,62 +212,105 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 }),
                 const SizedBox(height: 10),
                 Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          Icon(
-            Icons.warning, // Icon for allergies or warning
-            color: Colors.green, // Color of the icon
-          ),
-          const SizedBox(width: 8), // Space between the icon and the text
-          const Text(
-            'Do you have any allergic warnings?',
-            style: TextStyle(fontSize: 17),
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      Row(
-        children: [
-          const Text('No', style: TextStyle(fontSize: 15)),
-          Switch(
-            value: _allergyStatus == 'Yes',  // Check if the status is "Yes"
-            onChanged: (bool value) {
-              setState(() {
-                _allergyStatus = value ? 'Yes' : 'No';  // Update status
-              });
-              // Save automatically when toggled
-              _saveAllergyStatus();
-            },
-            activeColor: Colors.green,
-            inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey[300],
-          ),
-          const Text('Yes', style: TextStyle(fontSize: 16)),
-        ],
-      ),
-      if (_allergyStatus != null)
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            'Selected: $_allergyStatus',
-            style: const TextStyle(fontSize: 16, color: Colors.green),
-          ),
-        ),
-    ],
-  ),
-),
-
- _buildListTile(Icons.logout, 'Logout', () {
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.warning,
+                            color: Colors.green,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Do you have any allergic warnings?',
+                            style: TextStyle(fontSize: 17),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Text('No', style: TextStyle(fontSize: 15)),
+                          Switch(
+                            value: _allergyStatus == 'Yes',
+                            onChanged: (bool value) {
+                              setState(() {
+                                _allergyStatus = value ? 'Yes' : 'No';
+                              });
+                              _saveAllergyStatus();
+                            },
+                            activeColor: Colors.green,
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.grey[300],
+                          ),
+                          const Text('Yes', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      if (_allergyStatus != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Selected: $_allergyStatus',
+                            style: const TextStyle(fontSize: 16, color: Colors.green),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                _buildListTile(Icons.logout, 'Logout', () {
                   _logout(context);
                 }),
-
               ],
             ),
           ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selected, // Default selected index (Profile)
+        onTap: (index) {
+          setState(() {
+            _selected = index; // Update the selected index
+          });
+
+          // Navigate to the respective page when a bottom item is tapped
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CategoryScreen()),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+              );
+              break;
+            case 3:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+              );
+              break;
+            default:
+              break;
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Save'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
@@ -288,4 +333,5 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 }
+
 

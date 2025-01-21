@@ -266,7 +266,7 @@ class CartScreen extends ConsumerWidget {
         title: const Text('Cart'),
         centerTitle: true,
         backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
       ),
       body: cartItems.isEmpty
           ? const Center(child: Text('Your cart is empty'))

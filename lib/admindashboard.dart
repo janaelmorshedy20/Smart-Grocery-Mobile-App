@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:smartgrocery/actionpage.dart'; // Import ActionPage
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartgrocery/Login.dart';
+import 'package:smartgrocery/orders.dart';
 import 'package:smartgrocery/products.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
 import 'package:smartgrocery/vouchersActions.dart';
@@ -15,27 +16,61 @@ class AdminDashboard extends StatelessWidget {
   // Fetch the user count from Firestore
   Future<int> getUserCount() async {
     try {
-      // Fetch users collection and count the documents
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('users').get();
       return snapshot.docs.length;
     } catch (e) {
       print('Error fetching user count: $e');
-      return 0; // Return 0 if there is an error
+      return 0;
+    }
+  }
+
+  // Fetch the order count from Firestore
+  Future<int> getOrderCount() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('orders').get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching order count: $e');
+      return 0;
+    }
+  }
+
+  // Fetch the voucher count from Firestore
+  Future<int> getVoucherCount() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('vouchers').get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching voucher count: $e');
+      return 0;
+    }
+  }
+
+  // Fetch the product count from Firestore
+  Future<int> getProductCount() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('products').get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching product count: $e');
+      return 0;
     }
   }
 
   Future<void> logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Clear the session if necessary
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                const LoginScreen2()), // Navigate to login screen after logout
+          builder: (context) => const LoginScreen2(),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,7 +105,6 @@ class AdminDashboard extends StatelessWidget {
                   context,
                   title: 'Add Categories',
                   onTap: () {
-                    // Navigate to Categories Page
                     print('Categories clicked');
                   },
                 ),
@@ -88,10 +122,14 @@ class AdminDashboard extends StatelessWidget {
                 ),
                 _buildHeaderItem(
                   context,
-                  title: 'Orders',
+                  title: 'Add Vouchers',
                   onTap: () {
-                    // Navigate to Orders Page
-                    print('Orders clicked');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ActionPage(),
+                      ),
+                    );
                   },
                 ),
               ],
@@ -114,36 +152,69 @@ class AdminDashboard extends StatelessWidget {
                     title: 'Categories',
                     value: '3',
                     onTap: () {
-                      // Handle Categories card tap
+                      print('Categories tapped');
                     },
                   ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Products',
-                    value: '9',
-                    onTap: () {
-                      Navigator.push(
+                  // FutureBuilder for dynamic Product count
+                  FutureBuilder<int>(
+                    future: getProductCount(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Products',
+                          value: 'Loading...',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProductsPage(),
+                              ),
+                            );
+                          },
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Products',
+                          value: 'Error',
+                          onTap: () {},
+                        );
+                      }
+
+                      final productCount = snapshot.data ?? 0;
+                      return _buildDashboardCard(
                         context,
-                        MaterialPageRoute(builder: (context) => const ProductsPage()),
+                        title: 'Products',
+                        value: '$productCount',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProductsPage(),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
                   // FutureBuilder to load user count
                   FutureBuilder<int>(
-                    future: getUserCount(), // Fetch the actual user count
+                    future: getUserCount(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return _buildDashboardCard(
                           context,
                           title: 'Users',
-                          value:
-                              'Loading...', // Show loading text until data is fetched
+                          value: 'Loading...',
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const UsersTableScreen()),
+                                builder: (context) => const UsersTableScreen(),
+                              ),
                             );
                           },
                         );
@@ -154,9 +225,7 @@ class AdminDashboard extends StatelessWidget {
                           context,
                           title: 'Users',
                           value: 'Error',
-                          onTap: () {
-                            // Handle error (e.g., navigate to an error page)
-                          },
+                          onTap: () {},
                         );
                       }
 
@@ -169,45 +238,102 @@ class AdminDashboard extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const UsersTableScreen()),
+                              builder: (context) => const UsersTableScreen(),
+                            ),
                           );
                         },
                       );
                     },
                   ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Orders',
-                    value: '2',
-                    onTap: () {
-                      // Handle Orders card tap
-                    },
-                  ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Add vouchers',
-                    value: '34',
-                    onTap: () {
-                      // Navigate to ActionPage for adding vouchers
-                      Navigator.push(
+                  // FutureBuilder for dynamic Order count
+                  FutureBuilder<int>(
+                    future: getOrderCount(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Orders',
+                          value: 'Loading...',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AllOrdersPage(),
+                              ),
+                            );
+                          },
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Orders',
+                          value: 'Error',
+                          onTap: () {},
+                        );
+                      }
+
+                      final orderCount = snapshot.data ?? 0;
+                      return _buildDashboardCard(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const ActionPage(),
-                        ),
+                        title: 'Orders',
+                        value: '$orderCount',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AllOrdersPage(),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
-                  _buildDashboardCard(
-                    context,
-                    title: 'Vouchers',
-                    value: '3',
-                    onTap: () {
-                      // Navigate to ActionPage for adding vouchers
-                      Navigator.push(
+                  // FutureBuilder for dynamic Voucher count
+                  FutureBuilder<int>(
+                    future: getVoucherCount(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Vouchers',
+                          value: 'Loading...',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const VoucherActionScreen(),
+                              ),
+                            );
+                          },
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Vouchers',
+                          value: 'Error',
+                          onTap: () {},
+                        );
+                      }
+
+                      final voucherCount = snapshot.data ?? 0;
+                      return _buildDashboardCard(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const VoucherActionScreen(),
-                        ),
+                        title: 'Vouchers',
+                        value: '$voucherCount',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const VoucherActionScreen(),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
