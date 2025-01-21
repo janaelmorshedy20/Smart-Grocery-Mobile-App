@@ -88,10 +88,13 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Details'),
+        title: const Text(
+        'Product Details',
+        style: TextStyle(color: Colors.black), // Set text color to black
+        ),
         centerTitle: true,
         elevation: 0.5,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green,
         foregroundColor: Colors.black,
         actions: [
           IconButton(
@@ -126,7 +129,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           IconButton(
             icon: const Icon(
               Icons.shopping_cart,
-              color: Colors.green,
+              color: Colors.black,
             ),
             onPressed: () {
               Navigator.push(

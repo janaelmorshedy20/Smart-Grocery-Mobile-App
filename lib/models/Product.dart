@@ -20,7 +20,6 @@ class Product {
   final double newPrice;
   final bool isAllergenic;
   final Timestamp createdAt;
-  
   final String imageUrl;
 
   Product({
@@ -87,4 +86,28 @@ class Product {
       imageUrl: data['imageUrl'] ?? '', // Default empty string if 'imageUrl' is null
     );
   }
+
+  factory Product.fromMap(Map<String, dynamic> map) {
+  return Product(
+    id: map['id'], // Ensure 'id' is not null
+    name: map['name'] ?? '',
+    price: (map['price'] ?? 0.0).toDouble(),
+    detail: map['detail'] ?? '',
+    category: Category.fromMap(map['category'] ?? {}),
+    weight: (map['weight'] ?? 0.0).toDouble(),
+    quantity: map['quantity'] ?? 0,
+    productionDate: map['productionDate'] != null
+        ? formatter.parse(map['productionDate'])
+        : DateTime.now(),
+    expireDate: map['dateOfExpire'] != null
+        ? formatter.parse(map['dateOfExpire'])
+        : DateTime.now(),
+    isOnSale: map['isOnSale'] ?? false,
+    newPrice: (map['newPrice'] ?? 0.0).toDouble(),
+    isAllergenic: map['isAllergenic'] ?? false,
+    createdAt: map['createdAt'] ?? Timestamp.now(),
+    imageUrl: map['imageUrl'] ?? '',
+  );
+}
+
 }
