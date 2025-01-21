@@ -47,6 +47,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           setState(() {
             _customerName = userDoc['name'];
             _phoneNumber = userDoc['phone'];
+            
             _isLoading = false;
           });
         } else {

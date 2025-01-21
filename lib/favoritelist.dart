@@ -16,7 +16,7 @@ class FavoriteListScreen extends ConsumerWidget {
             style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
         elevation: 4,
       ),
       body: favoriteItems.isEmpty

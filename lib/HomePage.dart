@@ -153,7 +153,25 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: !_isSearching
-            ? const Text('eGrocery')
+            ? Row(
+  mainAxisAlignment: MainAxisAlignment.center, // Optional: to center the row horizontally
+  children: const [
+    Icon(
+      Icons.shopping_cart,
+      size: 35,
+      color: Colors.green,
+    ),
+    SizedBox(width: 10), 
+    Text(
+      'E-Grocery',
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ],
+)
+
             : TextField(
                 onChanged: _updateSearch,
                 decoration: InputDecoration(

@@ -57,9 +57,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose a Category'),
+        title: const Text('Choose a Category' , style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.green,
         foregroundColor: Colors.black,
       ),
       body: Padding(
