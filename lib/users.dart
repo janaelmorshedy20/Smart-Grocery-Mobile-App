@@ -10,6 +10,7 @@ class UsersTableScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Users Table'),
         centerTitle: true,
+        backgroundColor: Colors.green,
       ),
       body: FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('users').get(),
@@ -23,25 +24,58 @@ class UsersTableScreen extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No users found.'));
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.warning, color: Colors.grey, size: 50),
+                  SizedBox(height: 10),
+                  Text('No users found.', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                ],
+              ),
+            );
           }
 
           final users = snapshot.data!.docs;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('Name')),
-                DataColumn(label: Text('Email')),
+            child: Column(
+              children: [
+                const Text(
+                  'Users List',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                // Make the ListView scrollable
+                ListView.builder(
+                  shrinkWrap: true, // Ensures that the ListView takes up only the necessary space
+                  physics: NeverScrollableScrollPhysics(), // Disable scrolling within the ListView itself
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    final data = users[index].data() as Map<String, dynamic>;
+                    return Card(
+                      elevation: 5,
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16.0),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green,
+                          child: Text(data['name'][0].toUpperCase(), style: TextStyle(color: Colors.white)),
+                        ),
+                        title: Text(
+                          data['name'] ?? 'N/A',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(data['email'] ?? 'N/A', style: TextStyle(color: Colors.grey)),
+                      ),
+                    );
+                  },
+                ),
               ],
-              rows: users.map((user) {
-                final data = user.data() as Map<String, dynamic>;
-                return DataRow(cells: [
-                  DataCell(Text(data['name'] ?? 'N/A')),
-                  DataCell(Text(data['email'] ?? 'N/A')),
-                ]);
-              }).toList(),
             ),
           );
         },
