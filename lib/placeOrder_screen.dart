@@ -84,7 +84,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           ? const Center(child: CircularProgressIndicator())
           : cartItems.isEmpty
               ? const Center(child: Text('Your cart is empty'))
-              : Padding(
+              : SingleChildScrollView(  // Wrap the entire body inside SingleChildScrollView
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
