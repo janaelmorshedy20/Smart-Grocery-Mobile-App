@@ -20,6 +20,7 @@ class Product {
   final double newPrice;
   final bool isAllergenic;
   final Timestamp createdAt;
+  
   final String imageUrl;
 
   Product({

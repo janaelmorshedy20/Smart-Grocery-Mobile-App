@@ -7,11 +7,11 @@ class FilterScreen extends StatefulWidget {
 
 class _FilterScreenState extends State<FilterScreen> {
   double _currentMinPrice = 0;
-  double _currentMaxPrice = 100;
+  double _currentMaxPrice = 500;
   List<String> _selectedCategories = [];
 
   final List<String> categories = [
-    'Vegetables', 'Dairy', 'Bakery', 'Snacks', 'Beverages', 'Household Items'
+    'Fruits & Vegetables', 'Meat & Seafood', 'Bakery', 'Dairy & Eggs', 'Beverages', 'Nuts & Seeds', 'Herbs & Spices"', 'Chips & Snacks', 'Ice Creams', 'Personal Care', 'Cosmetics', 'Health & Wellness', 'Pet Supplies', 'Electronics', 'More'
   ];
 
   @override
@@ -28,8 +28,8 @@ class _FilterScreenState extends State<FilterScreen> {
             Text('Price Range (\$)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             RangeSlider(
               min: 0,
-              max: 100,
-              divisions: 20,
+              max: 500,
+              divisions: 30,
               values: RangeValues(_currentMinPrice, _currentMaxPrice),
               labels: RangeLabels(
                 '\$${_currentMinPrice.toInt()}',
