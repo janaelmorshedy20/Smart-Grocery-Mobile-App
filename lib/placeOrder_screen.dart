@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smartgrocery/models/Cart.dart';
 import 'package:smartgrocery/models/Order.dart' as OrderModel; // Alias the import
 import 'package:smartgrocery/provider/cartprovider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class PlaceOrderScreen extends ConsumerStatefulWidget {
   final List<CartItem> cartItems;
@@ -47,7 +47,6 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           setState(() {
             _customerName = userDoc['name'];
             _phoneNumber = userDoc['phone'];
-            
             _isLoading = false;
           });
         } else {
@@ -92,13 +91,11 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      // Display name as normal text
                       Text(
                         'Name: $_customerName',
                         style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 10),
-                      // Display phone number as normal text
                       Text(
                         'Phone: $_phoneNumber',
                         style: const TextStyle(fontSize: 16),
@@ -191,56 +188,68 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
   // Function to handle placing the order
   Future<void> _placeOrder(
       BuildContext context, List<CartItem> cartItems, double totalPrice) async {
+    if (_shippingAddressController.text.isEmpty) {
+      // Show error if shipping address is empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a shipping address.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     try {
-      // Convert CartItem to Cart (since CartItem has quantity, we need to adjust for that)
       List<Cart> convertedItems = cartItems.map((item) {
         return Cart(
           id: item.product.id,
           name: item.product.name,
           price: item.product.price,
-          totalprice: item.product.price * item.quantity, // Multiply by quantity
-          quantity: item.quantity,  // Added quantity
+          totalprice: item.product.price * item.quantity,
+          quantity: item.quantity,
         );
       }).toList();
 
       final order = OrderModel.Order(
-        // Use OrderModel.Order
-        id: '', // Firestore will generate the ID
-        items: convertedItems, // Use the converted Cart list
+        id: '',
+        items: convertedItems,
         totalPrice: totalPrice,
         status: 'Pending',
         orderDate: DateTime.now(),
         customerName: _customerName,
         shippingAddress: _shippingAddressController.text,
         phoneNumber: _phoneNumber,
-        paymentMethod: _paymentMethod, // Include payment method in the order
+        paymentMethod: _paymentMethod,
       );
 
-      // Save order to Firestore
-      final orderRef = await FirebaseFirestore.instance
-          .collection('orders')
-          .add(order.toMap());
+      await FirebaseFirestore.instance.collection('orders').add(order.toMap());
 
-      // Clear the cart after placing the order
-      await FirebaseFirestore.instance
-          .collection('carts')
-          .doc(orderRef.id)
-          .delete();
-
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Order placed successfully!'),
-        ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Order Placed Successfully'),
+            content: const Text(
+              'Thank you for your order! We will process it soon.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pushReplacementNamed(context, '/HomePage'); // Navigate to HomePage
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
       );
-
-      // Navigate back to the home page (or another page after successful order)
-      Navigator.popUntil(context, ModalRoute.withName('/'));
     } catch (e) {
       print('Error placing order: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Error placing the order. Please try again!'),
+          backgroundColor: Colors.red,
         ),
       );
     }
