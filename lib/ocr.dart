@@ -5,8 +5,6 @@
 // import 'package:gallery_picker/gallery_picker.dart'; // For picking images from the gallery
 // import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart'; // For OCR
 
-
-
 // class ShoppingListScreen extends StatefulWidget {
 //   @override
 //   _ShoppingListScreenState createState() => _ShoppingListScreenState();
@@ -279,26 +277,29 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 //import 'package:camera/camera.dart'; // For capturing images
 //import 'package:gallery_picker/gallery_picker.dart'; // For picking images from the gallery
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart'; // For OCR
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:smartgrocery/models/Product.dart';
 
+import 'cart_screen.dart';
+import 'provider/cartprovider.dart'; // For OCR
 
-class ShoppingListScreen extends StatefulWidget {
+class ShoppingListScreen extends ConsumerStatefulWidget {
   @override
   _ShoppingListScreenState createState() => _ShoppingListScreenState();
 }
 
-class _ShoppingListScreenState extends State<ShoppingListScreen> {
-  List shoppingList = [];
+class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
+  List<Product> shoppingList = [];
   String selectedFrequency = 'None'; // Default frequency
   String _recognizedText = ''; // OCR result
 
-  //File? _selectedImage;
-
-File? file;
+  File? file;
 
   // Function to process the selected or captured image
   Future<void> _processImage() async {
@@ -307,29 +308,53 @@ File? file;
     // });
 
     final ImagePicker picker = ImagePicker();
-        // Pick an image.
-        //final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-        // Capture a photo.
-        final XFile? imageCamera = await picker.pickImage(source: ImageSource.gallery);
-        if (imageCamera != null) file = File(imageCamera!.path); 
-        setState(() {
-        });
+    // Pick an image.
+    //final XFile? image = await picker.pickImage(source: ImageSource.camera);
+    // Capture a photo.
+    final XFile? imageCamera =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (imageCamera != null) file = File(imageCamera!.path);
+    setState(() {});
     final inputImage = InputImage.fromFile(file!);
     final textRecognizer = TextRecognizer();
 
     try {
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText =
+          await textRecognizer.processImage(inputImage);
 
-       // Process text into individual lines and update the shopping list
-    final lines = recognizedText.text.split('\n'); // Split text by lines
+      // Process text into individual lines and update the shopping list
+      final lines = recognizedText.text.split('\n'); // Split text by lines
+
+      List<Product> items = [];
+      for (var line in lines) {
+        print(line);
+        if (line.trim().isNotEmpty) {
+          Product? extracted = await _checkIfItemExists(line);
+          if (extracted != null) {
+            items.add(extracted);
+          }
+        }
+      }
+      print(items.length);
+      // shoppingList = items;
+      // print(shoppingList);
+
       setState(() {
         // _recognizedText = recognizedText.text.isNotEmpty ? recognizedText.text : 'No text recognized.';
-        shoppingList = lines
-          .where((line) => line.trim().isNotEmpty) // Filter out empty lines
-          .map((line) => {'title': line}) 
-          .toList();
 
-          // .map((line) => {'title': line, 'price': 0.0}) // Add default price
+        shoppingList.addAll(items);
+        print(shoppingList);
+        print(shoppingList.length);
+        print("Shopping list updated: ${shoppingList.length} items");
+        print(
+            'Final shopping list: ${shoppingList.map((e) => e.toString()).toList()}');
+
+        // shoppingList = lines
+        //     .where((line) => line.trim().isNotEmpty) // Filter out empty lines
+        //     .map((line) => {'title': line})
+        //     .toList();
+
+        // .map((line) => {'title': line, 'price': 0.0}) // Add default price
       });
     } catch (e) {
       setState(() {
@@ -340,17 +365,32 @@ File? file;
     }
   }
 
+  // Function to check if an item exists in Firebase
+  Future<Product?> _checkIfItemExists(String item) async {
+    try {
+      final collection = FirebaseFirestore.instance.collection('products');
+      final product = await collection.where('name', isEqualTo: item.trim().toLowerCase()).get();
+      if (product.docs.isNotEmpty) {
+        final data = product.docs.first;
+        print("found in firebase: $data['name']");
+        return Product.fromSnapshot(
+            data); // Assuming you have a fromMap method in Product
+      }
+    } catch (e) {
+      print('Error checking item existence for "$item": $e');
+    }
+    return null;
+  }
 // getImage() async{
 //     final ImagePicker picker = ImagePicker();
 //     // Pick an image.
 //     //final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 //     // Capture a photo.
 //     final XFile? imageCamera = await picker.pickImage(source: ImageSource.gallery);
-//     if (imageCamera != null) file = File(imageCamera!.path); 
+//     if (imageCamera != null) file = File(imageCamera!.path);
 //     setState(() {
 //     });
 // }
-
 
   // Function to delete an item from the shopping list
   void _deleteItem(int index) {
@@ -361,12 +401,22 @@ File? file;
 
   // Function to add all items to the cart
   void _addAllToCart() {
-    setState(() {
-      shoppingList.addAll(shoppingList);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All items added to cart!')),
-    );
+    for (var product in shoppingList) {
+      ref
+          .read(cartProvider.notifier)
+          .addProduct(product, 1); // Add product with quantity
+      print("${product.name}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All items added to cart!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
   }
 
   // Function to open the frequency selection dialog
@@ -398,46 +448,54 @@ File? file;
       ),
       body: Column(
         children: [
-            // MaterialButton(onPressed: () async{
-            //     await _processImage();
-            // }, child: const Text("Get Image"),),
-            // if(file != null) Image.file(file!, width: 200,height: 200,fit: BoxFit.fill),
-            const SizedBox(height: 20),
-            GestureDetector(
-              child: Center(
-                child: Container(
-                  width: 210,
-                  height: 210,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 2),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (file != null)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16), // Match border radius
-                          child: Image.file(file!, width: 210, height: 210, fit: BoxFit.fill,),
-                        )
-                      else
-                        const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_a_photo, color: Colors.grey),
-                            SizedBox(height: 8),
-                            Text('Upload Image', style: TextStyle(color: Colors.grey, fontSize: 14),),
-                          ],
+          // MaterialButton(onPressed: () async{
+          //     await _processImage();
+          // }, child: const Text("Get Image"),),
+          // if(file != null) Image.file(file!, width: 200,height: 200,fit: BoxFit.fill),
+          const SizedBox(height: 20),
+          GestureDetector(
+            child: Center(
+              child: Container(
+                width: 210,
+                height: 210,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (file != null)
+                      ClipRRect(
+                        borderRadius:
+                            BorderRadius.circular(16), // Match border radius
+                        child: Image.file(
+                          file!,
+                          width: 210,
+                          height: 210,
+                          fit: BoxFit.fill,
                         ),
-                    ],
-                  ),
+                      )
+                    else
+                      const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo, color: Colors.grey),
+                          SizedBox(height: 8),
+                          Text(
+                            'Upload Image',
+                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
               ),
-              onTap: () async {
-                await _processImage();
-              },
+            ),
+            onTap: () async {
+              await _processImage();
+            },
           ),
-
 
           // Display captured or selected image
           // if (_selectedImage != null)
@@ -455,7 +513,10 @@ File? file;
           //   ),
           // ),
           const SizedBox(height: 10),
-          const Text("Your Shopping List", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+          const Text(
+            "Your Shopping List",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 10),
           // Shopping list
           Expanded(
@@ -464,7 +525,7 @@ File? file;
               itemBuilder: (context, index) {
                 final item = shoppingList[index];
                 return ListTile(
-                  title: Text(item['title']),
+                  title: Text(item.name),
                   // subtitle: Text('\$${item['price']}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
@@ -495,7 +556,6 @@ File? file;
           const SizedBox(height: 16),
         ],
       ),
-
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -514,7 +574,10 @@ File? file;
           FloatingActionButton(
             onPressed: _openFrequencySelectionDialog,
             backgroundColor: Colors.green,
-            child: const Icon(Icons.schedule, color: Colors.white,),
+            child: const Icon(
+              Icons.schedule,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
