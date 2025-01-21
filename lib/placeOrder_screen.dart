@@ -80,7 +80,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           ? const Center(child: CircularProgressIndicator())
           : cartItems.isEmpty
               ? const Center(child: Text('Your cart is empty'))
-              : Padding(
+              : SingleChildScrollView(  // Make the body scrollable
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,8 +205,9 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           id: item.product.id,
           name: item.product.name,
           price: item.product.price,
-          totalprice: item.product.price * item.quantity,
-          quantity: item.quantity,
+          totalprice:
+              item.product.price * item.quantity, // Multiply by quantity
+          quantity: item.quantity, // Added quantity
         );
       }).toList();
 
@@ -273,9 +274,9 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 30,
-            backgroundImage: AssetImage('assets/product.png'),
+            backgroundImage: NetworkImage(item.product.imageUrl), // Use product image URL
           ),
           const SizedBox(width: 10),
           Expanded(

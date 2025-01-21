@@ -93,9 +93,9 @@ class CheckoutScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 30,
-            backgroundImage: AssetImage('assets/product.png'),
+            backgroundImage: NetworkImage(item.product.imageUrl), // Use product image URL
           ),
           const SizedBox(width: 10),
           Expanded(

@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system, // Automatically uses the system's theme mode (light/dark)
       initialRoute: isLoggedIn
-          ? (isAdmin ? '/admindashboard' : '/HomePage') // Admin gets admin dashboard
+          ? (isAdmin ? '/admindashboard' : '/categories') // Admin gets admin dashboard
           : '/login2', // Use '/HomePage' if user is logged in
       routes: {
         '/signup': (context) => const SignUpScreen(),
