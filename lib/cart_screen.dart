@@ -241,7 +241,6 @@ import 'package:smartgrocery/models/Cart.dart';
 import 'package:smartgrocery/provider/cartprovider.dart'; // Import the Cart model
 import 'checkout_screen.dart';
 
-
 // Define providers to manage the voucher code and discount
 final voucherCodeProvider = StateProvider<String>((ref) => '');
 final discountProvider = StateProvider<double>((ref) => 0.0);
@@ -277,9 +276,7 @@ class CartScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Display cart items
-                  ...cartItems
-                      .map((item) => _buildCartItem(item, ref))
-                      ,
+                  ...cartItems.map((item) => _buildCartItem(item, ref)),
                   const SizedBox(height: 20),
 
                   // Add Coupon Section
@@ -413,7 +410,11 @@ class CartScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    child: const Text('Checkout'),
+                    child: const Text(
+                      'Checkout',
+                      style: TextStyle(
+                          color: Colors.white), // Specify 'color' keyword
+                    ),
                   ),
                 ],
               ),
@@ -461,7 +462,8 @@ class CartScreen extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage(item.product.imageUrl), // Display product image dynamically
+            backgroundImage: NetworkImage(
+                item.product.imageUrl), // Display product image dynamically
           ),
           const SizedBox(width: 10),
           Expanded(

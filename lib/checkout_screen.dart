@@ -67,7 +67,10 @@ class CheckoutScreen extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Text('Proceed to Place Order'),
+                    child: const Text(
+                      'Procees To Place Order',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -95,7 +98,8 @@ class CheckoutScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage(item.product.imageUrl), // Use product image URL
+            backgroundImage:
+                NetworkImage(item.product.imageUrl), // Use product image URL
           ),
           const SizedBox(width: 10),
           Expanded(

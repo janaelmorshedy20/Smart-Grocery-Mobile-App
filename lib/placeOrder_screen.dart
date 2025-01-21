@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smartgrocery/models/Cart.dart';
-import 'package:smartgrocery/models/Order.dart' as OrderModel; // Alias the import
+import 'package:smartgrocery/models/Order.dart'
+    as OrderModel; // Alias the import
 import 'package:smartgrocery/provider/cartprovider.dart';
 
 class PlaceOrderScreen extends ConsumerStatefulWidget {
@@ -80,7 +81,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
           ? const Center(child: CircularProgressIndicator())
           : cartItems.isEmpty
               ? const Center(child: Text('Your cart is empty'))
-              : SingleChildScrollView(  // Make the body scrollable
+              : SingleChildScrollView(
+                  // Make the body scrollable
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +90,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                       // Customer Details
                       const Text(
                         'Customer Details',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       Text(
@@ -113,7 +116,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                       // Display Cart Items
                       const Text(
                         'Your Cart',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       ...cartItems.map((item) => _buildCartItem(item)).toList(),
@@ -131,7 +135,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                       // Payment Method Selection
                       const Text(
                         'Payment Method',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Row(
                         children: [
@@ -177,7 +182,10 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                         onPressed: () {
                           _placeOrder(context, cartItems, totalPrice);
                         },
-                        child: const Text('Place Order'),
+                        child: const Text(
+                          'Place Order',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -237,7 +245,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
-                  Navigator.pushReplacementNamed(context, '/HomePage'); // Navigate to HomePage
+                  Navigator.pushReplacementNamed(
+                      context, '/HomePage'); // Navigate to HomePage
                 },
                 child: const Text('OK'),
               ),
@@ -276,7 +285,8 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage(item.product.imageUrl), // Use product image URL
+            backgroundImage:
+                NetworkImage(item.product.imageUrl), // Use product image URL
           ),
           const SizedBox(width: 10),
           Expanded(
