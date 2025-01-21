@@ -89,8 +89,8 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-        'Product Details',
-        style: TextStyle(color: Colors.black), // Set text color to black
+          'Product Details',
+          style: TextStyle(color: Colors.black), // Set text color to black
         ),
         centerTitle: true,
         elevation: 0.5,
@@ -157,7 +157,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
           final product = snapshot.data!;
 
-          return Padding(
+          return SingleChildScrollView( // Make the body scrollable
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

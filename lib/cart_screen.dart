@@ -232,6 +232,7 @@
 //     });
 //   }
 // }import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -239,7 +240,6 @@ import 'package:smartgrocery/models/Product.dart';
 import 'package:smartgrocery/models/Cart.dart';
 import 'package:smartgrocery/provider/cartprovider.dart'; // Import the Cart model
 import 'checkout_screen.dart';
-
 
 // Define providers to manage the voucher code and discount
 final voucherCodeProvider = StateProvider<String>((ref) => '');
@@ -276,9 +276,7 @@ class CartScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Display cart items
-                  ...cartItems
-                      .map((item) => _buildCartItem(item, ref))
-                      ,
+                  ...cartItems.map((item) => _buildCartItem(item, ref)),
                   const SizedBox(height: 20),
 
                   // Add Coupon Section
@@ -412,7 +410,11 @@ class CartScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    child: const Text('Checkout'),
+                    child: const Text(
+                      'Checkout',
+                      style: TextStyle(
+                          color: Colors.white), // Specify 'color' keyword
+                    ),
                   ),
                 ],
               ),
@@ -458,9 +460,10 @@ class CartScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 30,
-            backgroundImage: AssetImage('assets/product.png'),
+            backgroundImage: NetworkImage(
+                item.product.imageUrl), // Display product image dynamically
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -470,6 +473,8 @@ class CartScreen extends ConsumerWidget {
                 Text(item.product.name,
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(item.product.detail,
+                    style: const TextStyle(color: Colors.grey)),
               ],
             ),
           ),
@@ -486,34 +491,4 @@ class CartScreen extends ConsumerWidget {
       ),
     );
   }
-
-  // void _checkout(
-  //     BuildContext context, List<CartItem> cartItems, double finalPrice) {
-  //   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  //   // Prepare the data for saving
-  //   List<Map<String, dynamic>> productData = cartItems.map((item) {
-  //     return {
-  //       'name': item.product.name,
-  //       'price': item.product.price,
-  //       'quantity': item.quantity, // Save the quantity as well
-  //     };
-  //   }).toList();
-
-  //   final cartData = {
-  //     'totalprice': finalPrice,
-  //     'products': productData,
-  //   };
-
-  //   firestore.collection('carts').add(cartData).then((_) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Cart saved successfully!')));
-
-  //     // Clear the cart after checkout
-  //     ref.read(cartProvider.notifier).clearCart();
-  //   }).catchError((error) {
-  //     ScaffoldMessenger.of(context)
-  //         .showSnackBar(SnackBar(content: Text('Error: $error')));
-  //   });
-  // }
 }
