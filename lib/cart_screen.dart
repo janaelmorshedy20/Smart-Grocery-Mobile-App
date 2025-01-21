@@ -470,12 +470,10 @@ class CartScreen extends ConsumerWidget {
                 Text(item.product.name,
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(item.product.detail,
-                    style: const TextStyle(color: Colors.grey)),
               ],
             ),
           ),
-          Text('${item.product.price} EGP x ${item.quantity}',
+          Text(' ${item.quantity}',
               style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 10),
           IconButton(
