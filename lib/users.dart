@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smartgrocery/usersorderforadmin.dart';
 
 class UsersTableScreen extends StatelessWidget {
   const UsersTableScreen({super.key});
@@ -71,6 +73,15 @@ class UsersTableScreen extends StatelessWidget {
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(data['email'] ?? 'N/A', style: TextStyle(color: Colors.grey)),
+                        onTap: () {
+                          // Navigate to the UserOrdersPage passing the user name
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserOrdersPage(userName: data['name']),
+                            ),
+                          );
+                        },
                       ),
                     );
                   },

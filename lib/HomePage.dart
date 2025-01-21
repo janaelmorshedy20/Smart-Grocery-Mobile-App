@@ -10,6 +10,7 @@ import 'models/Product.dart';
 import 'SearchResultsScreen.dart';
 import 'ProductDetailsScreen.dart';
 import 'OnSaleProductsScreen.dart';
+import 'RecentlyAddedScreen.dart';
 
 String supabaseBaseUrl = "https://gralztkxbszwirpnpjop.supabase.co/storage/v1/object/public";
 // Function to construct the full Supabase image URL
@@ -30,39 +31,10 @@ class _HomePageState extends State<HomePage> {
   List<Product> allProducts = [];
   List<Product> searchResults = [];
   List<Product> onSaleProducts = [];
+  List<Product> recentlyAddedProducts = []; // Store recently added products
 
-  /* final List<Map<String, dynamic>> popularPacks = [
-    {
-      'name': 'Bundle Pack',
-      'description': 'Onion, Oil, Salt',
-      'price': '\$35.0',
-      'oldPrice': '\$50.32',
-      'image': 'assets/bundle-pack.jpg',
-    },
-    {
-      'name': 'Medium Spice',
-      'description': 'Onion, Oil, Salt',
-      'price': '\$35.0',
-      'oldPrice': '\$50.32',
-      'image': 'assets/medium_spice.jpg',
-    },
-    {
-      'name': 'Fruit Basket',
-      'description': 'Apple, Banana, Orange',
-      'price': '\$25.0',
-      'oldPrice': '\$40.00',
-      'image': 'assets/fruit-basket.webp',
-    },
-    {
-      'name': 'Healthy Pack',
-      'description': 'Lettuce, Tomato, Carrot',
-      'price': '\$30.0',
-      'oldPrice': '\$45.00',
-      'image': 'assets/Healthy-pack.PNG',
-    },
-  ]; */
 
-  final List<Map<String, dynamic>> newItems = [
+  /* final List<Map<String, dynamic>> newItems = [
     {
       'name': 'Paradise Ice Cream Chocolate',
       'description': '800 gm',
@@ -91,14 +63,16 @@ class _HomePageState extends State<HomePage> {
       'oldPrice': '\$14.0',
       'image': 'assets/meat.jpg',
     },
-  ];
+  ]; */
 
   @override
-  void initState() {
+void initState() {
   super.initState();
   fetchProducts();
-  fetchOnSaleProducts(); // Fetch only products that are on sale
+  fetchOnSaleProducts();
+  fetchRecentlyAddedProducts();
 }
+
 
    Future<void> fetchProducts() async {
     var querySnapshot = await FirebaseFirestore.instance.collection('products').get();
@@ -129,6 +103,25 @@ class _HomePageState extends State<HomePage> {
     onSaleProducts = products; // Store the on-sale products
   });
 }
+
+Future<void> fetchRecentlyAddedProducts() async {
+  var querySnapshot = await FirebaseFirestore.instance
+      .collection('products')
+      .orderBy('createdAt', descending: true) // Fetch latest products first
+      .limit(10) // Fetch only the last 10 added products
+      .get();
+
+  var products = querySnapshot.docs.map((doc) {
+    var data = doc.data();
+    print("Recently Added Product: ${data['name']}, Created At: ${data['createdAt']}"); // Debugging
+    return Product.fromSnapshot(doc);
+  }).toList();
+
+  setState(() {
+    recentlyAddedProducts = products; // Store the recently added products
+  });
+}
+
 
 
   void _updateSearch(String value) {
@@ -195,7 +188,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.green,
             ),
             SizedBox(width: 10),
-            Text('eGrocery',
+            Text('E-Grocery',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -363,31 +356,42 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
-      // New Items Section (Fixed Brackets)
+      // Recently Added Section
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Our New Item',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            TextButton(
-                onPressed: () {}, 
-                child: const Text('View All', style: TextStyle(color: Colors.green))),
-          ],
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Recently Added',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RecentlyAddedScreen(
+                        recentlyAddedProducts: recentlyAddedProducts,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('View All', style: TextStyle(color: Colors.green)),
+              ),
+            ],
+          ),
         ),
-      ),
-      SizedBox(
-        height: 220,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: newItems.length,
-          itemBuilder: (context, index) {
-            final item = newItems[index];
-            return buildItemCardFromMap(item);
-          },
+        SizedBox(
+          height: 230,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: recentlyAddedProducts.length, 
+            itemBuilder: (context, index) {
+              final product = recentlyAddedProducts[index];
+              return buildItemCard(product);
+            },
+          ),
         ),
-      ),
+
     ],
   ),
 ),
@@ -437,7 +441,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Move this function OUTSIDE of buildItemCard
-Widget buildItemCardFromMap(Map<String, dynamic> item) {
+/* Widget buildItemCardFromMap(Map<String, dynamic> item) {
   return Padding(
     padding: const EdgeInsets.only(left: 16.0),
     child: Container(
@@ -482,97 +486,114 @@ Widget buildItemCardFromMap(Map<String, dynamic> item) {
       ),
     ),
   );
-}
+} */
 
 // This function stays the same but is now correctly structured
 Widget buildItemCard(Product product) {
-  return Padding(
-    padding: const EdgeInsets.only(left: 16.0),
-    child: GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailsScreen(productId: product.id),
-          ),
-        );
-      },
-      child: Container(
-        //width: 130,
-        width: 130,  // Increased from 130 to 150
-        height: 200, 
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 4),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailsScreen(productId: product.id),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Load image from Firestore (Ensure URL is correct)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.0),
-              child: product.imageUrl.isNotEmpty
-                  ? Image.network(
-                      product.imageUrl, // Direct Firestore URL
-                      height: 115,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset('assets/placeholder.png',
-                            height: 90, width: double.infinity, fit: BoxFit.cover);
-                      },
-                    )
-                  : Image.asset('assets/placeholder.png',
-                      height: 90, width: double.infinity, fit: BoxFit.cover),
-            ),
-            // Product Details
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    product.detail,
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${product.newPrice.toStringAsFixed(2)} EGP',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
-                      ),
-                      Text(
-                        '${product.price.toStringAsFixed(2)} EGP',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
-                      ),
-                    ],
-                  ),
-                ],
+          );
+        },
+        child: Container(
+          width: 130,
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 6,
+                offset: const Offset(0, 4),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Load image from Firestore
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: product.imageUrl.isNotEmpty
+                    ? Image.network(
+                        product.imageUrl,
+                        height: 115,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset('assets/placeholder.png', height: 90, width: double.infinity, fit: BoxFit.cover);
+                        },
+                      )
+                    : Image.asset('assets/placeholder.png', height: 90, width: double.infinity, fit: BoxFit.cover),
+              ),
+              // Product Details
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      product.detail,
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (product.isOnSale) ...[
+                          Text(
+                            '${product.newPrice.toStringAsFixed(2)} EGP',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Text(
+                            '${product.price.toStringAsFixed(2)} EGP',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        ] else ...[
+                          Text(
+                            '${product.price.toStringAsFixed(2)} EGP',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
 
 }
