@@ -493,7 +493,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   );
                 }),
-                _buildListTile(Icons.settings, 'Setting', () {}),
+                // _buildListTile(Icons.settings, 'Setting', () {}),
                 _buildListTile(Icons.payment, 'Payment', () {}),
                 _buildListTile(Icons.card_giftcard, 'Vouchers', () {
                   Navigator.push(
