@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:smartgrocery/models/Product.dart';
+import 'editProduct.dart';
 
 class ProductsPage extends StatelessWidget {
   const ProductsPage({super.key});
 
   Stream<List<Map<String, dynamic>>> getProductsFromFirestore() {
-    return FirebaseFirestore.instance
-        .collection('products') // Collection name should match your Firestore setup
+    return FirebaseFirestore.instance.collection('products') // Collection name should match your Firestore setup
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
-  }
+    }
 
   void deleteProduct(BuildContext context, Map<String, dynamic> product) async {
     final productId = product['id'];
@@ -27,14 +28,17 @@ class ProductsPage extends StatelessWidget {
             onPressed: () async {
               // Restore the product to Firestore
               await FirebaseFirestore.instance.collection('products').doc(productId).set(product);
+              print('Undo: ${product['name']} restored');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Undo: ${product['name']} restored')),
               );
             },
           ),
-          duration: const Duration(seconds: 4), // Duration before snackbar disappears
+          duration:const Duration(seconds: 4), // Duration before snackbar disappears
         ),
       );
+
+      print('Product deleted: $productId');
     } catch (e) {
       print('Error deleting product: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,7 +47,7 @@ class ProductsPage extends StatelessWidget {
     }
   }
 
-  void editProduct(BuildContext context, Map<String, dynamic> product) {
+  void editProduct(BuildContext context, Product product) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -63,41 +67,42 @@ class ProductsPage extends StatelessWidget {
         children: [
           // Product grid
           Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: getProductsFromFirestore(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+          child:StreamBuilder<List<Map<String, dynamic>>>(
+        stream: getProductsFromFirestore(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No products available'));
-                }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No products available'));
+          }
 
-                final products = snapshot.data!;
+          final products = snapshot.data!;
 
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      final product = products[index];
-                      return _buildProductCard(
-                        context,
-                        product: product,
-                        onDelete: () => deleteProduct(context, product),
-                        onEdit: () => editProduct(context, product),
-                      );
-                    },
-                  ),
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                final product = products[index];
+                final prod = Product.fromMap(product);
+                return _buildProductCard(
+                  context,
+                  product: product,
+                  onDelete: () => deleteProduct(context, product),
+                  onEdit: () => editProduct(context, prod),
                 );
               },
             ),
+          );
+        },
+      ),
           ),
         ],
       ),
@@ -152,26 +157,6 @@ class ProductsPage extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class EditProductScreen extends StatelessWidget {
-  final Map<String, dynamic> product;
-
-  const EditProductScreen({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    // Add your product editing logic here
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit ${product['name']}'),
-        backgroundColor: Colors.green,
-      ),
-      body: Center(
-        child: Text('Edit screen for ${product['name']}'),
       ),
     );
   }

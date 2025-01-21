@@ -24,7 +24,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: "https://gralztxksbzwiprnipoj.supabase.co",
-    anonKey: "your-supabase-anon-key", // Replace with your Supabase anon key
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyYWx6dHhrc2J6d2lwcm5pcG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczMzkxMjcsImV4cCI6MjA1MjkxNTEyN30.UTTiCnNEtezAz2iZ5lkaufbETnzcB1quVShfMf-29fM", // Replace with your Supabase anon key
   );
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
