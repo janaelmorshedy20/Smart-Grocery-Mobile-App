@@ -14,20 +14,25 @@ class FavoriteListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Favorites',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.green,
         foregroundColor: Colors.black,
         elevation: 4,
       ),
       body: favoriteItems.isEmpty
-          ? const Center(child: Text('No favorites yet', style: TextStyle(fontSize: 18, color: Colors.grey)))
+          ? const Center(
+              child: Text('No favorites yet',
+                  style: TextStyle(fontSize: 18, color: Colors.grey)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...favoriteItems.map((product) => _buildFavoriteItem(product, ref)).toList(),
+                  ...favoriteItems
+                      .map((product) => _buildFavoriteItem(product, ref))
+                      .toList(),
                 ],
               ),
             ),
@@ -38,7 +43,8 @@ class FavoriteListScreen extends ConsumerWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.favorite), label: 'Favorites'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
@@ -50,10 +56,13 @@ class FavoriteListScreen extends ConsumerWidget {
       key: Key(product.id), // Unique key for each product
       direction: DismissDirection.endToStart, // Swipe from right to left
       onDismissed: (direction) {
-        ref.read(favoriteProvider.notifier).removeProduct(product); // Remove from favorites
+        ref
+            .read(favoriteProvider.notifier)
+            .removeProduct(product); // Remove from favorites
 
         // After the item is removed, navigate back and refresh the ProductDetailsScreen
-        Navigator.pop(ref.context); // Pop the current screen (FavoriteListScreen)
+        Navigator.pop(
+            ref.context); // Pop the current screen (FavoriteListScreen)
         Navigator.pushReplacement(
           ref.context,
           MaterialPageRoute(
@@ -86,17 +95,26 @@ class FavoriteListScreen extends ConsumerWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16.0),
             boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8.0, offset: Offset(0, 4)),
+              BoxShadow(
+                  color: Colors.black26, blurRadius: 8.0, offset: Offset(0, 4)),
             ],
           ),
           child: Row(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: const CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage('assets/product.png'),
-                ),
+                child: product.imageUrl.isNotEmpty
+                    ? Image.network(
+                        product
+                            .imageUrl, // Display the product image from imageUrl
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      )
+                    : const CircleAvatar(
+                        radius: 30,
+                        backgroundImage: AssetImage('assets/product.png'),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -105,7 +123,10 @@ class FavoriteListScreen extends ConsumerWidget {
                   children: [
                     Text(
                       product.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -122,7 +143,10 @@ class FavoriteListScreen extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 '${product.price} EGP',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green),
               ),
             ],
           ),

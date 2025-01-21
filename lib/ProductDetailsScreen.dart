@@ -119,22 +119,34 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Display Product Image using product.imageUrl
                 Container(
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      product.imageUrl, // Display the product image
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
 
                 Text(
                   product.name,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
 
                 Text(
                   '${product.price} EGP',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green),
                 ),
                 const SizedBox(height: 20),
 
@@ -143,42 +155,61 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                Text(product.detail, style: const TextStyle(color: Colors.grey)),
+                Text(product.detail,
+                    style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 20),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const Text('Quantity:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Quantity:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 10),
-                    IconButton(onPressed: () => setState(() => quantity = (quantity > 1) ? quantity - 1 : quantity), icon: const Icon(Icons.remove)),
+                    IconButton(
+                        onPressed: () => setState(() => quantity =
+                            (quantity > 1) ? quantity - 1 : quantity),
+                        icon: const Icon(Icons.remove)),
                     Text('$quantity'),
-                    IconButton(onPressed: () => setState(() => quantity++), icon: const Icon(Icons.add)),
+                    IconButton(
+                        onPressed: () => setState(() => quantity++),
+                        icon: const Icon(Icons.add)),
                   ],
                 ),
 
                 const SizedBox(height: 20),
 
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green, minimumSize: const Size(double.infinity, 50)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      minimumSize: const Size(double.infinity, 50)),
                   onPressed: () {
                     if (quantity <= product.quantity) {
-                      ref.read(cartProvider.notifier).addProduct(product, quantity);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} added to cart!')));
+                      ref
+                          .read(cartProvider.notifier)
+                          .addProduct(product, quantity);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('${product.name} added to cart!')));
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not enough stock available'), backgroundColor: Colors.red));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Not enough stock available'),
+                          backgroundColor: Colors.red));
                     }
                   },
-                  child: const Text('Add To Cart', style: TextStyle(color: Colors.white)),
+                  child: const Text('Add To Cart',
+                      style: TextStyle(color: Colors.white)),
                 ),
                 const SizedBox(height: 20),
 
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 50)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      minimumSize: const Size(double.infinity, 50)),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const FavoriteListScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const FavoriteListScreen()),
                     );
                   },
                   child: const Text('Go to Favorites'),
