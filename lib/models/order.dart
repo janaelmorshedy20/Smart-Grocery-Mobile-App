@@ -10,7 +10,10 @@ class Order {
   final String customerName;
   final String shippingAddress;
   final String phoneNumber;
-  final String paymentMethod;  // New field added
+  final String paymentMethod;  // Payment method field
+  final String? cardNumber;    // Credit card number (nullable)
+  final String? expirationDate; // Credit card expiration date (nullable)
+  final String? cvv;           // Credit card CVV (nullable)
 
   Order({
     required this.id,
@@ -21,7 +24,10 @@ class Order {
     required this.customerName,
     required this.shippingAddress,
     required this.phoneNumber,
-    required this.paymentMethod,  // Added paymentMethod to constructor
+    required this.paymentMethod,
+    this.cardNumber,       // Optional: Only required if paymentMethod is 'Credit Card'
+    this.expirationDate,   // Optional: Only required if paymentMethod is 'Credit Card'
+    this.cvv,              // Optional: Only required if paymentMethod is 'Credit Card'
   });
 
   // Convert Firestore document to Order object
@@ -38,6 +44,9 @@ class Order {
       shippingAddress: data['shippingAddress'] ?? '',
       phoneNumber: data['phoneNumber'] ?? '',
       paymentMethod: data['paymentMethod'] ?? 'Cash on Delivery',  // Default to 'Cash on Delivery' if missing
+      cardNumber: data['cardNumber'],  // Optional: Card number can be null
+      expirationDate: data['expirationDate'],  // Optional: Expiration date can be null
+      cvv: data['cvv'],  // Optional: CVV can be null
     );
   }
 
@@ -53,6 +62,9 @@ class Order {
       'shippingAddress': shippingAddress,
       'phoneNumber': phoneNumber,
       'paymentMethod': paymentMethod,  // Include paymentMethod in the map
+      'cardNumber': cardNumber,       // Include cardNumber only if present
+      'expirationDate': expirationDate, // Include expirationDate only if present
+      'cvv': cvv,                     // Include cvv only if present
     };
   }
 }

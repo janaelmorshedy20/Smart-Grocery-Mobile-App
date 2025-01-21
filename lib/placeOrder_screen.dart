@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smartgrocery/models/Cart.dart';
-import 'package:smartgrocery/models/Order.dart' as OrderModel; // Alias the import
+import 'package:smartgrocery/models/order.dart' as OrderModel; // Alias the import
 import 'package:smartgrocery/provider/cartprovider.dart';
+import 'package:intl/intl.dart'; // For formatting the date
 
 class PlaceOrderScreen extends ConsumerStatefulWidget {
   final List<CartItem> cartItems;
@@ -22,10 +23,13 @@ class PlaceOrderScreen extends ConsumerStatefulWidget {
 
 class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
   final _shippingAddressController = TextEditingController();
+  final _cardNumberController = TextEditingController();
+  final _cvvController = TextEditingController();
   String _customerName = '';
   String _phoneNumber = '';
   bool _isLoading = true;
   String _paymentMethod = 'Cash on Delivery'; // Default payment method
+  String? _expirationDate;
 
   @override
   void initState() {
@@ -166,6 +170,48 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
                         ],
                       ),
 
+                      // Display Credit Card Fields if Credit Card is selected
+                      if (_paymentMethod == 'Credit Card') ...[
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: _cardNumberController,
+                          decoration: const InputDecoration(
+                            labelText: 'Card Number',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: _selectExpirationDate,
+                                child: AbsorbPointer(
+                                  child: TextField(
+                                    controller: TextEditingController(text: _expirationDate),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Expiration Date (MM/YY)',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: _cvvController,
+                                decoration: const InputDecoration(
+                                  labelText: 'CVV',
+                                  border: OutlineInputBorder(),
+                                ),
+                                obscureText: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+
                       const SizedBox(height: 20),
 
                       // Place Order Button
@@ -199,6 +245,20 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
       return;
     }
 
+    if (_paymentMethod == 'Credit Card' &&
+        (_cardNumberController.text.isEmpty ||
+            _expirationDate == null ||
+            _cvvController.text.isEmpty)) {
+      // Show error if credit card details are missing
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete all credit card fields.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     try {
       List<Cart> convertedItems = cartItems.map((item) {
         return Cart(
@@ -211,7 +271,7 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
       }).toList();
 
       final order = OrderModel.Order(
-        id: '',
+        id: '',  // You can leave it empty for Firestore auto-generated ID
         items: convertedItems,
         totalPrice: totalPrice,
         status: 'Pending',
@@ -220,6 +280,9 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
         shippingAddress: _shippingAddressController.text,
         phoneNumber: _phoneNumber,
         paymentMethod: _paymentMethod,
+        cardNumber: _paymentMethod == 'Credit Card' ? _cardNumberController.text : null,
+        expirationDate: _paymentMethod == 'Credit Card' ? _expirationDate : null,
+        cvv: _paymentMethod == 'Credit Card' ? _cvvController.text : null,
       );
 
       await FirebaseFirestore.instance.collection('orders').add(order.toMap());
@@ -296,5 +359,32 @@ class _PlaceOrderScreenState extends ConsumerState<PlaceOrderScreen> {
         ],
       ),
     );
+  }
+
+  // Function to show a month-year picker for expiration date
+  Future<void> _selectExpirationDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.green,
+            hintColor: Colors.green,
+            colorScheme: ColorScheme.light(primary: Colors.green),
+            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _expirationDate = DateFormat('MM/yy').format(pickedDate);
+      });
+    }
   }
 }
