@@ -1,56 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:smartgrocery/models/Product.dart';
-import 'editProduct.dart';
+import 'editCategory.dart';
+import 'models/Category.dart';
 
-class ProductsPage extends StatelessWidget {
-  const ProductsPage({super.key});
+class CategoriesPage extends StatelessWidget {
+  const CategoriesPage({super.key});
 
-  Stream<List<Map<String, dynamic>>> getProductsFromFirestore() {
-    return FirebaseFirestore.instance.collection('products') 
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  Stream<List<Category>> getCategoriesFromFirestore() {
+    // return FirebaseFirestore.instance.collection('categories').snapshots().map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+
+    return FirebaseFirestore.instance.collection('categories').snapshots().map(
+        (snapshot) => snapshot.docs.map((doc) => Category.fromSnapshot(doc)).toList());
     }
 
-  void deleteProduct(BuildContext context, Map<String, dynamic> product) async {
-    final productId = product['id'];
-
-    // Temporarily delete the product from Firestore
+  void deleteCategory(BuildContext context, Category category) async {
+    final categoryId = category.id;
+    // Temporarily delete the category from Firestore
     try {
-      await FirebaseFirestore.instance.collection('products').doc(productId).delete();
-
+      await FirebaseFirestore.instance.collection('categories').doc(categoryId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${product['name']} deleted'),
+          content: Text('${category.name} deleted'),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () async {
-              // Restore the product to Firestore
-              await FirebaseFirestore.instance.collection('products').doc(productId).set(product);
-              print('Undo: ${product['name']} restored');
+              // Restore the category to Firestore
+              await FirebaseFirestore.instance.collection('categories').doc(category.id).set(category.toMap());
+              print('Undo: ${category.name} restored');
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Undo: ${product['name']} restored')),
+                SnackBar(content: Text('Undo: ${category.name} restored')),
               );
             },
           ),
-          duration:const Duration(seconds: 5),
+          duration:const Duration(seconds: 4), // Duration before snackbar disappears
         ),
       );
 
-      print('Product deleted: $productId');
+      print('category deleted: $categoryId');
     } catch (e) {
-      print('Error deleting product: $e');
+      print('Error deleting category: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting ${product['name']}')),
+        SnackBar(content: Text('Error deleting ${category.name}')),
       );
     }
   }
 
-  void editProduct(BuildContext context, Product product) {
+  void editCategory(BuildContext context, Category category) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProductScreen(product: product),
+        builder: (context) => EditCategoryScreen(category: category),
       ),
     );
   }
@@ -59,25 +58,25 @@ class ProductsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Products'),
+        title: const Text('Categories'),
         backgroundColor: Colors.green,
       ),
       body: Column(
         children: [
-          // Product grid
+          // category grid
           Expanded(
-          child:StreamBuilder<List<Map<String, dynamic>>>(
-        stream: getProductsFromFirestore(),
+          child:StreamBuilder<List<Category>>(
+        stream: getCategoriesFromFirestore(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No products available'));
+            return const Center(child: Text('No categorys available'));
           }
 
-          final products = snapshot.data!;
+          final categories = snapshot.data!;
 
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -87,15 +86,15 @@ class ProductsPage extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              itemCount: products.length,
+              itemCount: categories.length,
               itemBuilder: (context, index) {
-                final product = products[index];
-                final prod = Product.fromMap(product);
-                return _buildProductCard(
+                final category = categories[index];
+                // final catg = Category.fromMap(category);
+                return _buildCategoryCard(
                   context,
-                  product: product,
-                  onDelete: () => deleteProduct(context, product),
-                  onEdit: () => editProduct(context, prod),
+                  category: category,
+                  onDelete: () => deleteCategory(context, category),
+                  onEdit: () => editCategory(context, category),
                 );
               },
             ),
@@ -108,9 +107,9 @@ class ProductsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProductCard(
+  Widget _buildCategoryCard(
     BuildContext context, {
-    required Map<String, dynamic> product,
+    required Category category,
     required VoidCallback onDelete,
     required VoidCallback onEdit,
   }) {
@@ -122,9 +121,9 @@ class ProductsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (product['imageUrl'] != null && product['imageUrl'].isNotEmpty)
+          if (category.imageUrl != null && category.imageUrl.isNotEmpty)
             Image.network(
-              product['imageUrl'],
+              category.imageUrl,
               height: 30,
               width: 30,
               fit: BoxFit.cover,
@@ -133,16 +132,11 @@ class ProductsPage extends StatelessWidget {
             const Icon(Icons.image_not_supported, size: 30, color: Colors.grey),
           const SizedBox(height: 8),
           Text(
-            product['name'] ?? 'Unknown',
+            category.name?? 'Unknown',
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
-          // if(product['onSale'])
-          Text(
-            '${product['price']} EGP',
-            style: const TextStyle(fontSize: 12, color: Colors.green),
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

@@ -7,99 +7,65 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'models/Category.dart';
 
-class AddCategoryScreen extends StatefulWidget {
-  const AddCategoryScreen({super.key});
+class EditCategoryScreen extends StatefulWidget {
+  final Category category;
+  const EditCategoryScreen({super.key, required this.category});
 
   @override
-  State<AddCategoryScreen> createState() => _AddCategoryScreenState();
+  State<EditCategoryScreen> createState() => _EditCategoryScreenState();
 }
 
-class _AddCategoryScreenState extends State<AddCategoryScreen> {
+class _EditCategoryScreenState extends State<EditCategoryScreen> {
   final TextEditingController _nameController = TextEditingController();
+
+  late String imageUrl;
 
   bool _isLoading = false;
 
   final Uuid uuid = const Uuid();
 
-  Future<void> addCategory() async {
-    if (!formState.currentState!.validate()) {
-      return;
-    }
+  File? file;
 
-    setState(() {
-      _isLoading = true;
-    });
+  GlobalKey<FormState> formState = GlobalKey();
 
-    // Step 1: Upload image to Supabase
-    String fileName = _nameController.text;
-    String imageUrl = await uploadImageToSupabase(fileName);
+  List<Category> _categories = [];
 
-    if (imageUrl == '') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter category image")),
-      );
-      return;
-    }
+  @override
+  void initState() {
+    super.initState();
+    fillCategoryFields();
+  }
 
-    try {
-      final category = Category(
-        id: uuid.v4(),
-        name: _nameController.text,
-        imageUrl: imageUrl,
-        // createdAt: Timestamp.now(),
-      );
 
-      // Add category data to Firestore
-      // Step 2: Save category to Firestore
-      if (imageUrl.isNotEmpty) {
-        await FirebaseFirestore.instance
-            .collection('categories')
-            .add(category.toMap());
+  // Pre-fill fields for editing
+  late final Category category;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Category added successfully!')),
-        );
-      }
-
-      formState.currentState!.reset();
-      setState(() {
-        _nameController.clear();
-        file = null;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error adding category: $e')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+  void fillCategoryFields() {
+    if (widget.category != null) {
+      // Pre-fill fields for editing
+      category = widget.category!;
+      _nameController.text = category.name;
+      imageUrl = category.imageUrl;
+      print(imageUrl);
     }
   }
 
   Future<String> uploadImageToSupabase(String fileName) async {
     if (file == null) {
-      print("couldn't upload the image to supabase");
+      print("couldn't upload the image");
       return '';
     }
     try {
-      await Supabase.instance.client.storage
-          .from('images') // 'images' is your Supabase storage bucket name
-          .upload(fileName, file!)
-           // ignore: avoid_print
-          .then((value) => print("Image upload successful"));
+      await Supabase.instance.client.storage.from('images') // 'images' is your Supabase storage bucket name
+          .upload(fileName, file!).then((value) => print("Image upload successful"));
 
-      final imageUrl = Supabase.instance.client.storage
-          .from('images')
-          .getPublicUrl(fileName);
+      final imageUrl = Supabase.instance.client.storage.from('images').getPublicUrl(fileName);
       return imageUrl;
     } catch (e) {
       print('Error uploading image: $e');
       return '';
     }
   }
-
-  File? file;
 
   getImage() async {
     final ImagePicker picker = ImagePicker();
@@ -109,14 +75,53 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     setState(() {});
   }
 
-  GlobalKey<FormState> formState = GlobalKey();
+  Future<void> saveCategory() async {
+    if (!formState.currentState!.validate()) {
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    if (file != null) {
+      String fileName = _nameController.text;
+      imageUrl = await uploadImageToSupabase(fileName);
+    }
+    if (imageUrl.isEmpty || imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please provide a category image")),
+      );
+      return;
+    }
+    try {
+      final category = Category(
+        id: widget.category?.id ?? uuid.v4(),
+        name: _nameController.text,
+        imageUrl: imageUrl,
+      );
+      // Update existing category
+      final docRef = FirebaseFirestore.instance.collection('categories').doc(category.id);
+      await docRef.update(category.toMap());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Category updated successfully!')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving category: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Add category',
+          'Edit Category',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -159,10 +164,15 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : const Icon(
-                            Icons.photo_camera,
-                            color: Colors.grey,
-                          ),
+                        : imageUrl != null && imageUrl.isNotEmpty
+                            ? Image.network(
+                                imageUrl,
+                                height: 30,
+                                width: 30,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(Icons.image_not_supported,
+                                size: 30, color: Colors.grey),
                   ),
                 ),
                 onTap: () async {
@@ -179,13 +189,13 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.isEmpty)
                     return "Please enter the category name";
-                  }
                 },
               ),
+              const SizedBox(height: 20),
               const SizedBox(height: 30),
-              // Add category Button
+              // Add Category Button
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -196,9 +206,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: addCategory,
+                  onPressed: saveCategory,
                   child: const Text(
-                    "Add Category",
+                    "Save Category",
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

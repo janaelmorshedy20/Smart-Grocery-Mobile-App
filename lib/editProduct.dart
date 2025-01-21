@@ -101,7 +101,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
       await Supabase.instance.client.storage
           .from('images') // 'images' is your Supabase storage bucket name
           .upload(fileName, file!)
-          // ignore: avoid_print
           .then((value) => print("Image upload successful"));
 
       final imageUrl = Supabase.instance.client.storage

@@ -7,6 +7,8 @@ import 'package:smartgrocery/orders.dart';
 import 'package:smartgrocery/products.dart';
 import 'package:smartgrocery/users.dart'; // Import UsersTableScreen
 import 'package:smartgrocery/vouchersActions.dart';
+import 'addCategory.dart';
+import 'categories.dart';
 import 'addProduct.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -61,6 +63,17 @@ class AdminDashboard extends StatelessWidget {
     }
   }
 
+  Future<int> getCategoryCount() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('categories').get();
+      return snapshot.docs.length;
+    } catch (e) {
+      print('Error fetching category count: $e');
+      return 0;
+    }
+  }
+
   Future<void> logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -105,7 +118,7 @@ class AdminDashboard extends StatelessWidget {
                   context,
                   title: 'Add Categories',
                   onTap: () {
-                    print('Categories clicked');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AddCategoryScreen(),),); 
                   },
                 ),
                 _buildHeaderItem(
@@ -147,12 +160,34 @@ class AdminDashboard extends StatelessWidget {
                   mainAxisSpacing: 16,
                 ),
                 children: [
-                  _buildDashboardCard(
-                    context,
-                    title: 'Categories',
-                    value: '3',
-                    onTap: () {
-                      print('Categories tapped');
+                   FutureBuilder<int>(
+                    future: getCategoryCount(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return _buildDashboardCard(
+                          context,
+                          title: 'Categories',
+                          value: 'Loading...',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const CategoriesPage(),),); 
+                          },
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return _buildDashboardCard(context, title: 'Categories', value: 'Error',
+                          onTap: () {},
+                        );
+                      }
+
+                      final categoryCount = snapshot.data ?? 0;
+                      return _buildDashboardCard(
+                        context,
+                        title: 'Categories',
+                        value: '$categoryCount',
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const CategoriesPage(),),);
+                        },
+                      );
                     },
                   ),
                   // FutureBuilder for dynamic Product count

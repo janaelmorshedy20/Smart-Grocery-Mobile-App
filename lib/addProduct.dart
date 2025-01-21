@@ -27,8 +27,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _expireDateController = TextEditingController();
   Category? _selectedCategory;
 
-  // DateTime? _productionDate;
-  // DateTime? _expireDate;
   bool _isOnSale = false;
   bool _isAllergyCausing = false;
 
@@ -62,45 +60,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> addProductToFirebase() async {
-//-------------------------------------------------------
-//hattshal
-    // if (_nameController.text.isEmpty ||
-    //     _priceController.text.isEmpty ||
-    //     _selectedCategory == null) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Please fill in all required fields")),
-    //   );
-    //   return;
-    // }
-
-    // // Price validation: check if it's a positive number
-    // final price = double.tryParse(_priceController.text);
-    // if (price == null || price <= 0) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("The price should be a positive number")),
-    //   );
-    //   return;
-    // }
-    // if (_selectedCategory == null) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Please select a category")),
-    //   );
-    //   return;
-    // }
-    // if (_nameController.text.isEmpty) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Please enter the product name")),
-    //   );
-    //   return;
-    // }
-
-    // if (_detailController.text.isEmpty) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("Please enter product details")),
-    //   );
-    //   return;
-    // }
-//---------------------------------------------------------
 
     if (!formState.currentState!.validate()) {
       return;
@@ -185,8 +144,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       return '';
     }
     try {
-      // final file = File(filePath);
-      // final path = '/products/$fileName';
       await Supabase.instance.client.storage
           .from('images') // 'images' is your Supabase storage bucket name
           .upload(fileName, file!)
@@ -286,7 +243,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter the product name";
-                  return null;
                   }
                 },
               ),
@@ -305,7 +261,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   }
                   if (double.parse(value) <= 0) {
                     return "Please enter a valid price";
-                  return null;
                   }
                 },
               ),
@@ -366,7 +321,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   }
                   if (double.parse(value) <= 0) {
                     return "Please enter a valid Weight";
-                  return null;
                   }
                 },
               ),
@@ -382,7 +336,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   }
                   if (int.parse(value) <= 0) {
                     return "Please enter a valid quantity";
-                  return null;
                   }
                 },
               ),
@@ -547,12 +500,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                   ),
                   onPressed: addProductToFirebase,
-                  // onPressed: () {
-                  //   // if (formState.currentState!.validate()) {
-                  //   print("inside on press");
-                  //   addProductToFirebase;
-                  //   // }
-                  // },
                   child: const Text(
                     "Add Product",
                     style: TextStyle(
