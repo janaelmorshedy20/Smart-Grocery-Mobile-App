@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,6 +28,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchAllergyStatus();
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       userId = currentUser.uid;
@@ -38,6 +38,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  // Fetch user profile data (name and phone)
   void _fetchUserProfile() async {
     setState(() {
       _isLoading = true;
@@ -67,6 +68,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  // Fetch allergy status from SharedPreferences
+  Future<void> _fetchAllergyStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _allergyStatus = prefs.getString('allergyStatus') ?? 'No'; // Default to 'No'
+    });
+  }
+
+  // Save allergy status to SharedPreferences
   Future<void> _saveAllergyStatus() async {
     if (_allergyStatus == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,6 +86,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
       return;
     }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('allergyStatus', _allergyStatus!); // Save to SharedPreferences
 
     try {
       await FirebaseFirestore.instance
@@ -333,5 +346,3 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 }
-
-
