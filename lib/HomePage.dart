@@ -1,5 +1,7 @@
+//HomePage
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'categoryScreen.dart';
 import 'favoritelist.dart';
 import 'package:smartgrocery/userprofile.dart';
@@ -7,6 +9,13 @@ import 'filter_screen.dart';
 import 'models/Product.dart';
 import 'SearchResultsScreen.dart';
 import 'ProductDetailsScreen.dart';
+import 'OnSaleProductsScreen.dart';
+
+String supabaseBaseUrl = "https://gralztkxbszwirpnpjop.supabase.co/storage/v1/object/public";
+// Function to construct the full Supabase image URL
+String getImageUrl(String imagePath) {
+  return "$supabaseBaseUrl/images/$imagePath"; 
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,8 +29,9 @@ class _HomePageState extends State<HomePage> {
   bool _isSearching = false;
   List<Product> allProducts = [];
   List<Product> searchResults = [];
+  List<Product> onSaleProducts = [];
 
-  final List<Map<String, dynamic>> popularPacks = [
+  /* final List<Map<String, dynamic>> popularPacks = [
     {
       'name': 'Bundle Pack',
       'description': 'Onion, Oil, Salt',
@@ -50,7 +60,7 @@ class _HomePageState extends State<HomePage> {
       'oldPrice': '\$45.00',
       'image': 'assets/Healthy-pack.PNG',
     },
-  ];
+  ]; */
 
   final List<Map<String, dynamic>> newItems = [
     {
@@ -85,18 +95,41 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
-    fetchProducts();
-  }
+  super.initState();
+  fetchProducts();
+  fetchOnSaleProducts(); // Fetch only products that are on sale
+}
 
    Future<void> fetchProducts() async {
     var querySnapshot = await FirebaseFirestore.instance.collection('products').get();
-    var products = querySnapshot.docs.map((doc) => Product.fromSnapshot(doc)).toList();
+    var products = querySnapshot.docs.map((doc) {
+    var data = doc.data();
+    print("Product: ${data['name']}, Image URL: ${data['imageUrl']}"); // Debugging
+    return Product.fromSnapshot(doc);
+    }).toList();
+
     setState(() {
-      allProducts = products;
-    });
-    
-  }
+    allProducts = products;
+      });
+    }
+
+  Future<void> fetchOnSaleProducts() async {
+    var querySnapshot = await FirebaseFirestore.instance
+      .collection('products')
+      .where('isOnSale', isEqualTo: true) // Get only on-sale products
+      .get();
+
+    var products = querySnapshot.docs.map((doc) {
+    var data = doc.data();
+    print("On Sale Product: ${data['name']}, Image URL: ${data['imageUrl']}"); // Debugging
+    return Product.fromSnapshot(doc);
+  }).toList();
+
+  setState(() {
+    onSaleProducts = products; // Store the on-sale products
+  });
+}
+
 
   void _updateSearch(String value) {
   setState(() {
@@ -154,40 +187,38 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         title: !_isSearching
             ? Row(
-  mainAxisAlignment: MainAxisAlignment.center, // Optional: to center the row horizontally
-  children: const [
-    Icon(
-      Icons.shopping_cart,
-      size: 35,
-      color: Colors.green,
-    ),
-    SizedBox(width: 10), 
-    Text(
-      'E-Grocery',
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ],
-)
-
-            : TextField(
-                onChanged: _updateSearch,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.cancel),
-                    onPressed: () {
-                      setState(() {
-                        _isSearching = false;
-                        _searchText = '';
-                        searchResults.clear();
-                      });
-                    },
-                  ),
-                ),
+          mainAxisAlignment: MainAxisAlignment.center, // Center the row horizontally
+          children: const [
+            Icon(
+              Icons.shopping_cart,
+              size: 35,
+              color: Colors.green,
+            ),
+            SizedBox(width: 10),
+            Text('eGrocery',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
+            ),
+          ],
+        )
+      : TextField(
+          onChanged: _updateSearch,
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.cancel),
+              onPressed: () {
+                setState(() {
+                  _isSearching = false;
+                  _searchText = '';
+                  searchResults.clear();
+                });
+              },
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -204,54 +235,69 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SingleChildScrollView(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      if (_isSearching && _searchText.isNotEmpty)
-  SizedBox(
-  height: 250, // Adjust as needed
-  child: searchResults.isNotEmpty
-      ? ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: searchResults.length,
-          itemBuilder: (context, index) {
-            final product = searchResults[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                elevation: 3,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(10),
-                  //leading: Image.asset(
-                    //'assets/product_placeholder.png', // Replace with actual product image
-                    //width: 50,
-                    //height: 50,
-                    //fit: BoxFit.cover,
-                  //),
-                  title: Text(
-                    product.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(color: Colors.green, fontSize: 16),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductDetailsScreen(productId: product.id),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
-        )
-      : const Center(child: Text('No matching products', style: TextStyle(fontSize: 16))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_isSearching && _searchText.isNotEmpty)
+              SizedBox(
+                height: 250,
+                child: searchResults.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          final product = searchResults[index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 3,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  product.imageUrl,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset('assets/placeholder.png', width: 80, height: 80, fit: BoxFit.cover);
+                                  },
+                                ),
+                              ),
+                              title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (product.isOnSale) ...[
+                                    Text(
+                                      '${product.newPrice.toStringAsFixed(2)} EGP',
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                                    ),
+                                    Text(
+                                      '${product.price.toStringAsFixed(2)} EGP',
+                                      style: const TextStyle(fontSize: 14, color: Colors.red, decoration: TextDecoration.lineThrough),
+                                    ),
+                                  ] else ...[
+                                    Text(
+                                      '${product.price.toStringAsFixed(2)} EGP',
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetailsScreen(productId: product.id),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      )
+                    : const Center(child: Text('No matching products', style: TextStyle(fontSize: 16))),
 ),
 
             // Banner Section
@@ -284,28 +330,36 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      // Popular Packs
+      // On Sale Section
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Popular Packs',
+            const Text('On Sale',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             TextButton(
-                onPressed: () {}, 
-                child: const Text('View All', style: TextStyle(color: Colors.green))),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OnSaleProductsScreen(onSaleProducts: onSaleProducts),
+                  ),
+                );
+              },
+              child: const Text('View All', style: TextStyle(color: Colors.green)),
+            ),
           ],
         ),
       ),
       SizedBox(
-        height: 200,
+        height: 230,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: popularPacks.length,
+          itemCount: onSaleProducts.length,
           itemBuilder: (context, index) {
-            final pack = popularPacks[index];
-            return buildItemCard(pack);
+            final product = onSaleProducts[index];
+            return buildItemCard(product);
           },
         ),
       ),
@@ -324,13 +378,13 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       SizedBox(
-        height: 200,
+        height: 220,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: newItems.length,
           itemBuilder: (context, index) {
             final item = newItems[index];
-            return buildItemCard(item);
+            return buildItemCardFromMap(item);
           },
         ),
       ),
@@ -382,11 +436,71 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildItemCard(Map<String, dynamic> item) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0),
+  // Move this function OUTSIDE of buildItemCard
+Widget buildItemCardFromMap(Map<String, dynamic> item) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 16.0),
+    child: Container(
+      width: 130,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.asset(item['image'], height: 90, width: double.infinity, fit: BoxFit.cover),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item['name'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(item['description'], style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(item['price'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green)),
+                    const SizedBox(width: 8),
+                    Text(item['oldPrice'], style: const TextStyle(fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// This function stays the same but is now correctly structured
+Widget buildItemCard(Product product) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 16.0),
+    child: GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(productId: product.id),
+          ),
+        );
+      },
       child: Container(
-        width: 120,
+        //width: 130,
+        width: 130,  // Increased from 130 to 150
+        height: 200, 
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
@@ -401,22 +515,53 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Load image from Firestore (Ensure URL is correct)
             ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(item['image'], height: 90, width: double.infinity, fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(10.0),
+              child: product.imageUrl.isNotEmpty
+                  ? Image.network(
+                      product.imageUrl, // Direct Firestore URL
+                      height: 115,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset('assets/placeholder.png',
+                            height: 90, width: double.infinity, fit: BoxFit.cover);
+                      },
+                    )
+                  : Image.asset('assets/placeholder.png',
+                      height: 90, width: double.infinity, fit: BoxFit.cover),
             ),
+            // Product Details
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item['name'], style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  Text(item['description'], style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  Row(
+                  Text(
+                    product.name,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    product.detail,
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item['price'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green)),
-                      const SizedBox(width: 8),
-                      Text(item['oldPrice'], style: const TextStyle(fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough)),
+                      Text(
+                        '${product.newPrice.toStringAsFixed(2)} EGP',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                      Text(
+                        '${product.price.toStringAsFixed(2)} EGP',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, decoration: TextDecoration.lineThrough),
+                      ),
                     ],
                   ),
                 ],
@@ -425,7 +570,11 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
 }
+
+
+}
+
 

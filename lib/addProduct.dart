@@ -356,7 +356,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 controller: _weightController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                    suffixText: 'Kg',
+                    suffixText: 'g',
                     labelText: "Weight",
                     border: OutlineInputBorder()),
                 // decoration: const InputDecoration(suffixText: 'Liter', labelText: "Weight", border: OutlineInputBorder()),
