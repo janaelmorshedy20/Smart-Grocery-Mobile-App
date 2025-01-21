@@ -11,6 +11,7 @@ import 'SearchResultsScreen.dart';
 import 'ProductDetailsScreen.dart';
 import 'OnSaleProductsScreen.dart';
 import 'RecentlyAddedScreen.dart';
+import 'ocr.dart';
 
 String supabaseBaseUrl = "https://gralztkxbszwirpnpjop.supabase.co/storage/v1/object/public";
 // Function to construct the full Supabase image URL
@@ -224,6 +225,17 @@ Future<void> fetchRecentlyAddedProducts() async {
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _applyFilters,
+          ),
+          IconButton(
+            icon: const Icon(Icons.document_scanner),
+            onPressed: (){
+              Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ShoppingListScreen(),
+          ),
+        );
+            },
           ),
         ],
       ),

@@ -419,23 +419,23 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               );
   }
 
-  // Function to open the frequency selection dialog
-  void _openFrequencySelectionDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return FrequencySelectionDialog(
-          selectedFrequency: selectedFrequency,
-          onFrequencySelected: (String frequency) {
-            setState(() {
-              selectedFrequency = frequency;
-            });
-            Navigator.pop(context); // Close the dialog after selection
-          },
-        );
-      },
-    );
-  }
+  // // Function to open the frequency selection dialog
+  // void _openFrequencySelectionDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return FrequencySelectionDialog(
+  //         selectedFrequency: selectedFrequency,
+  //         onFrequencySelected: (String frequency) {
+  //           setState(() {
+  //             selectedFrequency = frequency;
+  //           });
+  //           Navigator.pop(context); // Close the dialog after selection
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -549,106 +549,106 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           const SizedBox(height: 16),
 
           // Display selected frequency
-          Text(
-            'Selected Frequency: $selectedFrequency',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // FloatingActionButton(
-          //   onPressed: _captureImage,
-          //   backgroundColor: Colors.blue,
-          //   child: const Icon(Icons.camera_alt),
+          // Text(
+          //   'Selected Frequency: $selectedFrequency',
+          //   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           // ),
           // const SizedBox(height: 16),
-          // FloatingActionButton(
-          //   onPressed: _pickImageFromGallery,
-          //   backgroundColor: Colors.orange,
-          //   child: const Icon(Icons.photo_library),
-          // ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: _openFrequencySelectionDialog,
-            backgroundColor: Colors.green,
-            child: const Icon(
-              Icons.schedule,
-              color: Colors.white,
-            ),
-          ),
         ],
       ),
+      // // // floatingActionButton: Column(
+      // // //   mainAxisAlignment: MainAxisAlignment.end,
+      // // //   children: [
+      // // //     // FloatingActionButton(
+      // // //     //   onPressed: _captureImage,
+      // // //     //   backgroundColor: Colors.blue,
+      // // //     //   child: const Icon(Icons.camera_alt),
+      // // //     // ),
+      // // //     // const SizedBox(height: 16),
+      // // //     // FloatingActionButton(
+      // // //     //   onPressed: _pickImageFromGallery,
+      // // //     //   backgroundColor: Colors.orange,
+      // // //     //   child: const Icon(Icons.photo_library),
+      // // //     // ),
+      // // //     const SizedBox(height: 16),
+      // // //     FloatingActionButton(
+      // // //       onPressed: _openFrequencySelectionDialog,
+      // // //       backgroundColor: Colors.green,
+      // // //       child: const Icon(
+      // // //         Icons.schedule,
+      // // //         color: Colors.white,
+      // // //       ),
+      // // //     ),
+      // //   ],
+      // ),
     );
   }
 }
 
-class FrequencySelectionDialog extends StatefulWidget {
-  final String selectedFrequency;
-  final Function(String) onFrequencySelected;
+// class FrequencySelectionDialog extends StatefulWidget {
+//   final String selectedFrequency;
+//   final Function(String) onFrequencySelected;
 
-  const FrequencySelectionDialog({
-    required this.selectedFrequency,
-    required this.onFrequencySelected,
-  });
+//   const FrequencySelectionDialog({
+//     required this.selectedFrequency,
+//     required this.onFrequencySelected,
+//   });
 
-  @override
-  _FrequencySelectionDialogState createState() =>
-      _FrequencySelectionDialogState();
-}
+//   @override
+//   _FrequencySelectionDialogState createState() =>
+//       _FrequencySelectionDialogState();
+// }
 
-class _FrequencySelectionDialogState extends State<FrequencySelectionDialog> {
-  late String tempFrequency;
+// class _FrequencySelectionDialogState extends State<FrequencySelectionDialog> {
+//   late String tempFrequency;
 
-  @override
-  void initState() {
-    super.initState();
-    tempFrequency = widget.selectedFrequency;
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     tempFrequency = widget.selectedFrequency;
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Set Frequency'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RadioListTile<String>(
-            title: const Text('Weekly'),
-            value: 'Weekly',
-            groupValue: tempFrequency,
-            onChanged: (value) {
-              setState(() {
-                tempFrequency = value!;
-              });
-            },
-          ),
-          RadioListTile<String>(
-            title: const Text('Monthly'),
-            value: 'Monthly',
-            groupValue: tempFrequency,
-            onChanged: (value) {
-              setState(() {
-                tempFrequency = value!;
-              });
-            },
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onFrequencySelected(tempFrequency);
-          },
-          child: const Text('Save'),
-        ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return AlertDialog(
+//       title: const Text('Set Frequency'),
+//       content: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           RadioListTile<String>(
+//             title: const Text('Weekly'),
+//             value: 'Weekly',
+//             groupValue: tempFrequency,
+//             onChanged: (value) {
+//               setState(() {
+//                 tempFrequency = value!;
+//               });
+//             },
+//           ),
+//           RadioListTile<String>(
+//             title: const Text('Monthly'),
+//             value: 'Monthly',
+//             groupValue: tempFrequency,
+//             onChanged: (value) {
+//               setState(() {
+//                 tempFrequency = value!;
+//               });
+//             },
+//           ),
+//         ],
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.pop(context),
+//           child: const Text('Cancel'),
+//         ),
+//         ElevatedButton(
+//           onPressed: () {
+//             widget.onFrequencySelected(tempFrequency);
+//           },
+//           child: const Text('Save'),
+//         ),
+//       ],
+//     );
+//   }
+// }

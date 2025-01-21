@@ -14,41 +14,11 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  // final categories = [
-  //   {'name': 'Fruits and Vegetables', 'icon': Icons.local_florist},
-  //   {'name': 'Bakery', 'icon': Icons.cake},
-  //   {'name': 'Meat and Fish', 'icon': Icons.set_meal},
-  //   {'name': 'Dairy and Eggs', 'icon': Icons.egg},
-  //   {'name': 'Milk', 'icon': Icons.local_drink},
-  //   {'name': 'Beverages', 'icon': Icons.local_cafe},
-  //   {'name': 'Snacks', 'icon': Icons.fastfood},
-  //   {'name': 'Medicine', 'icon': Icons.medical_services},
-  //   {'name': 'Baby Care', 'icon': Icons.child_friendly},
-  //   {'name': 'Beauty', 'icon': Icons.brush},
-  //   {'name': 'Gym Equipment', 'icon': Icons.fitness_center},
-  //   {'name': 'Gardening Tools', 'icon': Icons.grass},
-  //   {'name': 'Pet Care', 'icon': Icons.pets},
-  //   {'name': 'Others', 'icon': Icons.more_horiz},
-  // ];
-
-//  List<Category> _categories = [];
 
    Stream<List<Category>> getCategories() {
     return FirebaseFirestore.instance.collection('categories').snapshots()
     .map((snapshot) => snapshot.docs.map((doc) => Category.fromSnapshot(doc)).toList());
   }
-  // Future<void> getCategories() async {
-  //   try {
-  //     final snapshot = await FirebaseFirestore.instance.collection('categories').get();
-  //     setState(() {
-  //       _categories = snapshot.docs.map((doc) => Category.fromMap(doc.data())).toList();
-  //     });
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error loading categories: $e')),
-  //     );
-  //   }
-  // }
 
   int selectedIndex = -1; // Default: No category selected
   int _selected = 1;  // Default selected index (Home)
@@ -99,15 +69,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
               },
               child: Column(
                 children: [
-                  // CircleAvatar(
-                  //   radius: 28,
-                  //   backgroundColor:
-                  //       isSelected ? Colors.green : Colors.grey[200],
-                  //   child: Icon(
-                  //     category['icon'] as IconData,
-                  //     color: isSelected ? Colors.white : Colors.black,
-                  //   ),
-                  // ),
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor:
+                        isSelected ? Colors.green : Colors.grey[200],
+                    child: Image.network(
+                      category.imageUrl,
+                      fit: BoxFit.cover,
+                    )
+                  ),
                   const SizedBox(height: 5),
                   Text(
                     category.name,
