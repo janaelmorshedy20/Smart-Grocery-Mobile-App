@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smartgrocery/cart_screen.dart';
@@ -21,13 +22,43 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   bool isFavorite = false;
   int quantity = 1;
 
-  // Simulate user's allergenic status (Replace with actual user data source)
-  bool isUserAllergenic = true; // This should be fetched from user profile or Firestore
+  // Variable to hold user's allergenic status
+  bool isUserAllergenic = false; // Default is false
 
   @override
   void initState() {
     super.initState();
     _product = getProductDetailsFromFirestore(widget.productId);
+    _fetchUserAllergenicStatus(); // Fetch the user's allergenic status from Firestore
+  }
+
+  // Fetch user allergenic status from the `allergy_warnings` collection
+  void _fetchUserAllergenicStatus() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        // Fetch user's allergy status from the 'allergy_warnings' collection
+        DocumentSnapshot allergyDoc = await FirebaseFirestore.instance
+            .collection('allergy_warnings')
+            .doc(currentUser.uid)
+            .get();
+
+        if (allergyDoc.exists) {
+          // Check the allergyStatus field (Yes/No)
+          setState(() {
+            isUserAllergenic = allergyDoc['allergyStatus'] == "Yes";
+          });
+        } else {
+          setState(() {
+            isUserAllergenic = false; // Default to false if allergy data not found
+          });
+        }
+      } catch (e) {
+        print("Error fetching user allergenic status: $e");
+      }
+    } else {
+      print('User not logged in');
+    }
   }
 
   Future<Product> getProductDetailsFromFirestore(String productId) async {
@@ -90,7 +121,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
       appBar: AppBar(
         title: const Text(
           'Product Details',
-          style: TextStyle(color: Colors.black), // Set text color to black
+          style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
         elevation: 0.5,
@@ -157,7 +188,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
           final product = snapshot.data!;
 
-          return SingleChildScrollView( // Make the body scrollable
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +202,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Image.network(
-                      product.imageUrl, // Display the product image
+                      product.imageUrl,
                       fit: BoxFit.cover,
                     ),
                   ),
